@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './auth.routes.js';
 import postRoutes from './post.routes.js';
+import uploadRoutes from './upload.routes.js';
 
 const router = Router();
 
@@ -10,9 +11,11 @@ const router = Router();
  *
  * /api/auth  → Authentication (register, login, OAuth, refresh, logout, me)
  * /api/posts → Blog posts (CRUD, public feed, dashboard)
+ * /api/uploads → Image uploads (Cloudinary)
  */
 router.use('/auth', authRoutes);
 router.use('/posts', postRoutes);
+router.use('/uploads', uploadRoutes);
 
 /**
  * GET /api/health

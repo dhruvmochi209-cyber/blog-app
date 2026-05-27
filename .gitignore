@@ -1,0 +1,10 @@
+# Specific files and directories requested by the user to exclude from GitHub
+/stitch_nexus_dev_platform 2/
+/landing.html
+/Multi-User Engineering Blog Platform-project_blueprint-qn4qfd8e87b4ujwrz1dgij654e.pdf
+
+# Common files to ignore
+.DS_Store
+node_modules/
+dist/
+.env
