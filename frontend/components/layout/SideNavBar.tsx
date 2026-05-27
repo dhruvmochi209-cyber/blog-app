@@ -35,7 +35,6 @@ export default function SideNavBar() {
     { name: 'Home', icon: 'home', href: '/feed' },
     { name: 'Explore', icon: 'explore', href: '/explore' },
     { name: 'Bookmarks', icon: 'bookmarks', href: '/bookmarks' },
-    { name: 'Write', icon: 'edit_square', href: '/write' },
   ];
 
   // Close mobile drawer on navigation click
@@ -111,37 +110,28 @@ export default function SideNavBar() {
           </div>
         </div>
 
-        {/* Bottom Profile Section + Logout for Mobiles/Tablets */}
+        {/* Bottom Profile / Sign out Section */}
         {user && (
-          <div className="border-t border-outline-variant/20 pt-4 md:pt-3 flex flex-col gap-1.5">
-            {/* Profile Link */}
-            <Link
-              href="/profile"
-              onClick={handleLinkClick}
-              className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all duration-200"
-            >
-              {user.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="w-6 h-6 rounded-full object-cover border border-outline-variant/30"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-semibold text-on-surface border border-outline-variant/30">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <span className="font-body-md text-sm truncate font-medium">{user.name}</span>
-            </Link>
-
-            {/* Dedicated Logout item for Mobiles & Tablets */}
+          <div className="border-t border-outline-variant/20 pt-4 flex flex-col gap-3">
+            <div className="flex items-center gap-3 px-2">
+              <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border border-outline-variant/30 shrink-0">
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="font-label-caps text-on-surface text-sm">{user.name.charAt(0).toUpperCase()}</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-body-md text-sm font-bold text-on-surface truncate">{user.name}</p>
+                <p className="font-body-md text-xs text-on-surface-variant truncate">{user.email}</p>
+              </div>
+            </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-error hover:bg-error-container/20 transition-all duration-200 w-full text-left cursor-pointer"
-              title="Sign out of Writen"
+              className="flex items-center gap-3 px-3 py-2.5 text-sm text-error hover:bg-error-container/20 rounded-xl transition-all w-full text-left font-medium active:scale-95 cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[22px]">logout</span>
-              <span className="font-body-md text-sm font-medium">Sign out</span>
+              <span className="material-symbols-outlined text-[20px]">logout</span>
+              <span>Sign out</span>
             </button>
           </div>
         )}

@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth-context';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,8 @@ const CATEGORIES = [
   'Culture',
 ];
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -50,7 +53,8 @@ function slugify(text: string): string {
 type BlockType = 'category' | 'coverImage' | 'excerpt' | 'keywords' | 'content';
 
 export default function WritePage() {
-  const { user } = useAuth();
+  const { user, accessToken, refreshUser } = useAuth();
+  const router = useRouter();
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   // ── Form State ──
@@ -62,11 +66,15 @@ export default function WritePage() {
   const [content, setContent] = useState('');
 
   // ── Block State ──
-  // Starts empty, allowing the user to add blocks in any order
   const [activeBlocks, setActiveBlocks] = useState<BlockType[]>([]);
   const [showToolbar, setShowToolbar] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // ── Publish States ──
   const [publishing, setPublishing] = useState(false);
+  const publishingRef = useRef(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [createdPost, setCreatedPost] = useState<any>(null);
 
   // Auto-generated slug
   const slug = useMemo(() => slugify(title), [title]);
@@ -77,17 +85,22 @@ export default function WritePage() {
     [keywords]
   );
 
+  // Reading time calculator
+  const readingTime = useMemo(() => {
+    const text = content.replace(/<[^>]*>/g, ''); // strip html tags
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.ceil(words / 200));
+  }, [content]);
+
   const handleBlockAction = (blockType: BlockType) => {
     if (activeBlocks.includes(blockType)) {
-      // If already added, scroll to it and highlight/focus it
       setShowToolbar(false);
       const el = document.getElementById(`block-card-${blockType}`);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('ring-2', 'ring-primary/40');
-        setTimeout(() => el.classList.remove('ring-2', 'ring-primary/40'), 1500);
+        el.classList.add('ring-2', 'ring-primary/45');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-primary/45'), 1500);
       }
-      
       const inputEl = document.getElementById(`input-${blockType}`);
       if (inputEl) {
         inputEl.focus();
@@ -95,11 +108,9 @@ export default function WritePage() {
       return;
     }
 
-    // Add block
     setActiveBlocks([...activeBlocks, blockType]);
     setShowToolbar(false);
     
-    // Clear missing block errors if resolved
     if (errors[`block_${blockType}`]) {
       setErrors(prev => {
         const next = { ...prev };
@@ -108,18 +119,14 @@ export default function WritePage() {
       });
     }
 
-    // Auto-focus new block inputs
     setTimeout(() => {
       const el = document.getElementById(`input-${blockType}`);
-      if (el) {
-        el.focus();
-      }
+      if (el) el.focus();
     }, 100);
   };
 
   const deleteBlock = (blockType: BlockType) => {
     setActiveBlocks(activeBlocks.filter(b => b !== blockType));
-    // Clear errors for deleted blocks
     setErrors(prev => {
       const next = { ...prev };
       delete next[blockType];
@@ -128,14 +135,17 @@ export default function WritePage() {
     });
   };
 
-  // ── Validation ──
+  // ── Aligned Zod Validation ──
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
     
-    // 1. Validate Title (mandatory, fixed)
+    // 1. Validate Title (mandatory, min 5 chars, max 200 chars in backend)
     if (!title.trim()) {
       newErrors.title = 'Title is required';
-      titleInputRef.current?.focus();
+    } else if (title.trim().length < 5) {
+      newErrors.title = 'Title is too short (must be at least 5 characters)';
+    } else if (title.trim().length > 200) {
+      newErrors.title = 'Title is too long (cannot exceed 200 characters)';
     }
 
     // 2. Validate block presence
@@ -147,47 +157,132 @@ export default function WritePage() {
     });
 
     // 3. Validate block values (if active)
-    if (activeBlocks.includes('category') && !category) {
-      newErrors.category = 'Please select a category';
+    if (activeBlocks.includes('category')) {
+      if (!category) {
+        newErrors.category = 'Please select a category';
+      } else if (category.length < 2 || category.length > 50) {
+        newErrors.category = 'Category must be between 2 and 50 characters';
+      }
     }
-    if (activeBlocks.includes('coverImage') && !coverImage.trim()) {
-      newErrors.coverImage = 'Cover image URL is required';
+    
+    if (activeBlocks.includes('coverImage')) {
+      if (!coverImage.trim()) {
+        newErrors.coverImage = 'Cover image URL is required';
+      } else {
+        try {
+          new URL(coverImage.trim());
+        } catch {
+          newErrors.coverImage = 'Please enter a valid cover image URL (e.g. https://...)';
+        }
+      }
     }
-    if (activeBlocks.includes('excerpt') && !excerpt.trim()) {
-      newErrors.excerpt = 'Excerpt is required';
+    
+    if (activeBlocks.includes('excerpt')) {
+      if (!excerpt.trim()) {
+        newErrors.excerpt = 'Excerpt is required';
+      } else if (excerpt.trim().length < 10) {
+        newErrors.excerpt = 'Excerpt is too short (must be at least 10 characters)';
+      } else if (excerpt.trim().length > 500) {
+        newErrors.excerpt = 'Excerpt is too long (cannot exceed 500 characters)';
+      }
     }
-    if (activeBlocks.includes('keywords') && !keywords.trim()) {
-      newErrors.keywords = 'At least one SEO keyword is required';
+    
+    if (activeBlocks.includes('keywords')) {
+      if (!keywords.trim()) {
+        newErrors.keywords = 'SEO keywords are required';
+      } else if (keywords.trim().length > 500) {
+        newErrors.keywords = 'SEO keywords string cannot exceed 500 characters';
+      }
     }
-    if (activeBlocks.includes('content') && (!content.trim() || content === '<p></p>')) {
-      newErrors.content = 'Content cannot be empty';
+    
+    if (activeBlocks.includes('content')) {
+      const textOnly = content.replace(/<[^>]*>/g, '').trim();
+      if (!content.trim() || content === '<p></p>') {
+        newErrors.content = 'Content is required';
+      } else if (textOnly.length < 10) {
+        newErrors.content = 'Content is too short (must be at least 10 characters)';
+      }
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    // Focus first invalid block
+    if (Object.keys(newErrors).length > 0) {
+      if (newErrors.title) {
+        titleInputRef.current?.focus();
+      } else {
+        const firstErrorBlock = required.find(req => newErrors[req] || newErrors[`block_${req}`]);
+        if (firstErrorBlock && activeBlocks.includes(firstErrorBlock)) {
+          const cardEl = document.getElementById(`block-card-${firstErrorBlock}`);
+          if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const inputEl = document.getElementById(`input-${firstErrorBlock}`);
+          if (inputEl) inputEl.focus();
+        }
+      }
+      return false;
+    }
+    return true;
   };
 
+  // ── API Publish Hook ──
   const handlePublish = async () => {
+    if (publishingRef.current) return; // Strict synchronous double-submission guard
     if (!validate()) return;
+    publishingRef.current = true;
     setPublishing(true);
-    // TODO: POST to backend API
-    console.log({
-      title,
-      slug,
-      category,
-      coverImage,
-      excerpt,
-      keywords: keywordChips,
-      content,
-    });
-    setTimeout(() => setPublishing(false), 1500);
+
+    try {
+      const res = await fetch(`${API_BASE}/posts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          title,
+          htmlContent: content,
+          category,
+          excerpt,
+          coverImage,
+          seoKeywords: keywords,
+          status: 'PUBLISHED',
+        }),
+      });
+
+      const resData = await res.json();
+
+      if (resData.success) {
+        setCreatedPost(resData.data);
+        setShowPreview(true); // Show Preview Overlay
+        
+        // Promote Visitor to Creator role inside Auth Context immediately
+        if (resData.roleUpgraded) {
+          await refreshUser();
+        }
+      } else {
+        if (resData.errors && Array.isArray(resData.errors)) {
+          const newErrors: Record<string, string> = {};
+          resData.errors.forEach((err: any) => {
+            newErrors[err.field] = err.message;
+          });
+          setErrors(newErrors);
+        } else {
+          setErrors({ submit: resData.message || 'Failed to publish post.' });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setErrors({ submit: 'An unexpected connection error occurred. Make sure the backend server is running on port 5001.' });
+    } finally {
+      publishingRef.current = false;
+      setPublishing(false);
+    }
   };
 
   const handleSaveDraft = () => {
     console.log('Saving draft…', { title, activeBlocks, content });
   };
 
-  // Insert options list (all options are always visible now)
   const insertOptions = [
     { type: 'category' as BlockType, icon: 'category', label: 'Category Picker' },
     { type: 'coverImage' as BlockType, icon: 'image', label: 'Featured Cover' },
@@ -217,7 +312,7 @@ export default function WritePage() {
           <button
             onClick={handlePublish}
             disabled={publishing}
-            className="bg-primary text-on-primary font-label-caps text-xs px-5 py-2 rounded-full hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-95 disabled:opacity-60 flex items-center gap-2 shadow-sm font-semibold"
+            className="bg-primary text-on-primary font-label-caps text-xs px-5 py-2 rounded-full hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-95 disabled:opacity-60 flex items-center gap-2 shadow-sm font-semibold animate-none"
           >
             {publishing ? (
               <span className="material-symbols-outlined animate-spin text-[16px]">progress_activity</span>
@@ -244,7 +339,14 @@ export default function WritePage() {
 
       {/* ── Main Canvas ── */}
       <main className="flex-1 max-w-[720px] w-full mx-auto px-6 py-12 flex flex-col relative">
-        
+        {/* Connection/Submit Errors */}
+        {errors.submit && (
+          <div className="mb-6 p-4 bg-error-container/20 border border-error/30 rounded-xl flex items-start gap-3">
+            <span className="material-symbols-outlined text-error text-[20px] shrink-0 mt-0.5">error</span>
+            <p className="text-sm text-error font-medium">{errors.submit}</p>
+          </div>
+        )}
+
         {/* Title Input Block (Fixed) */}
         <div className="mb-4">
           <input
@@ -421,7 +523,6 @@ export default function WritePage() {
 
         {/* ── Block Addition Insert Bar (Clean Left Gutter Alignment) ── */}
         <div className="flex items-center gap-4 relative py-6 -ml-[44px] md:-ml-[48px] -ml-[8px] z-30">
-          {/* Plus symbol toggle button */}
           <button
             onClick={() => setShowToolbar(!showToolbar)}
             title={showToolbar ? "Close options" : "Add block"}
@@ -434,7 +535,6 @@ export default function WritePage() {
             <span className="material-symbols-outlined text-[22px]">add</span>
           </button>
 
-          {/* Sliding Insert Bar Options (Always 100% visible) */}
           <div
             className={`flex items-center gap-2.5 transition-all duration-300 origin-left ${
               showToolbar ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 -translate-x-4 scale-95 pointer-events-none'
@@ -456,7 +556,6 @@ export default function WritePage() {
                     <span className="material-symbols-outlined text-[20px]">{opt.icon}</span>
                   </button>
                   
-                  {/* Tooltip hover info */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all pointer-events-none z-50">
                     <div className="bg-inverse-surface text-inverse-on-surface font-label-caps text-[10px] tracking-wider px-2.5 py-1 rounded shadow-md whitespace-nowrap uppercase">
                       {opt.label} {isActive ? '(Added)' : ''}
@@ -487,6 +586,111 @@ export default function WritePage() {
         )}
 
       </main>
+
+      {/* ─── 🚀 FULL SCREEN READER PREVIEW OVERLAY ─── */}
+      {showPreview && createdPost && (
+        <div className="fixed inset-0 z-[100] bg-surface overflow-y-auto flex flex-col animate-in fade-in slide-in-from-bottom-6 duration-300">
+          {/* Preview Navigation Header */}
+          <header className="sticky top-0 bg-surface/90 backdrop-blur-md border-b border-outline-variant/20 px-6 py-4 flex justify-between items-center z-10 w-full">
+            <div className="flex items-center gap-2 text-on-surface">
+              <span className="material-symbols-outlined text-primary text-[20px]">visibility</span>
+              <span className="font-label-caps text-xs uppercase tracking-wider font-bold">Story Reader Preview</span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowPreview(false)}
+                className="font-label-caps text-xs text-on-surface-variant hover:text-on-surface px-4 py-2.5 rounded-full border border-outline-variant/30 hover:bg-surface-container-low transition-all"
+              >
+                Go Back & Edit
+              </button>
+              <button
+                onClick={() => router.push('/feed')}
+                className="bg-primary text-on-primary font-label-caps text-xs px-6 py-2.5 rounded-full hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-95 shadow-sm font-semibold flex items-center gap-1.5"
+              >
+                Finish & Exit
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </div>
+          </header>
+
+          {/* Reader View Content Wrapper */}
+          <article className="max-w-[720px] w-full mx-auto px-6 py-12 flex flex-col">
+            {/* Category Tag pill */}
+            {category && (
+              <div className="mb-4">
+                <span className="px-3.5 py-1 bg-primary/10 text-primary text-xs font-label-caps border border-primary/20 rounded-full font-semibold">
+                  {category}
+                </span>
+              </div>
+            )}
+
+            {/* Title */}
+            <h1 className="font-display-xl text-4xl md:text-5xl font-bold text-on-surface leading-tight mb-6">
+              {title}
+            </h1>
+
+            {/* Author details block */}
+            <div className="flex items-center gap-3 mb-8 pb-6 border-b border-outline-variant/15">
+              <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border border-outline-variant/30">
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="font-label-caps text-on-surface text-sm">{user?.name.charAt(0).toUpperCase()}</span>
+                )}
+              </div>
+              <div>
+                <p className="font-body-md text-sm font-bold text-on-surface">{user?.name || 'Anonymous Author'}</p>
+                <div className="flex items-center gap-1.5 text-xs text-on-surface-variant font-body-md mt-0.5">
+                  <span>Published Today</span>
+                  <span>·</span>
+                  <span className="flex items-center gap-0.5"><span className="material-symbols-outlined text-[14px]">schedule</span>{readingTime} min read</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Excerpt panel */}
+            {excerpt && (
+              <div className="mb-8 p-5 bg-surface-container-low border-l-4 border-primary rounded-r-xl italic font-serif text-on-surface-variant text-base leading-relaxed">
+                "{excerpt}"
+              </div>
+            )}
+
+            {/* Featured Cover Image */}
+            {coverImage && (
+              <div className="mb-10 aspect-video rounded-xl overflow-hidden border border-outline-variant/20 shadow-md">
+                <img
+                  src={coverImage}
+                  alt="Article Cover"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
+            {/* TipTap Rich HTML Content */}
+            <div 
+              className="tiptap font-serif leading-relaxed text-on-surface text-lg md:text-xl space-y-6"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
+
+            {/* Keywords/SEO tag chips list */}
+            {keywordChips.length > 0 && (
+              <div className="mt-12 pt-6 border-t border-outline-variant/15 flex flex-wrap gap-2">
+                {keywordChips.map((chip, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs rounded-full font-label-caps border border-outline-variant/20 flex items-center gap-0.5 font-medium"
+                  >
+                    <span className="text-[10px] text-on-surface-variant/70">#</span>
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            )}
+
+          </article>
+        </div>
+      )}
     </div>
   );
 }
