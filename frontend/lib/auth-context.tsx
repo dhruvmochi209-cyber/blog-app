@@ -1,0 +1,208 @@
+'use client';
+
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+
+const API = process.env.NEXT_PUBLIC_API_URL!;
+const LAST_USER_KEY = 'blog_last_user';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: 'VISITOR' | 'CREATOR';
+  avatar: string | null;
+  googleId: string | null;
+  githubId: string | null;
+  createdAt: string;
+}
+
+/** Slim snapshot stored in localStorage — only for displaying the popup */
+export interface LastUserSnapshot {
+  name: string;
+  email: string;
+  avatar: string | null;
+}
+
+interface AuthContextType {
+  user: User | null;
+  accessToken: string | null;
+  loading: boolean;
+  lastUser: LastUserSnapshot | null;   // ← for the "Continue as" popup
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  setTokenFromOAuth: (token: string) => Promise<void>;
+  clearLastUser: () => void;           // ← dismiss the popup permanently
+}
+
+// ─── Context ──────────────────────────────────────────────────────────────────
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
+  return ctx;
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const saveLastUser = (user: User) => {
+  try {
+    const snapshot: LastUserSnapshot = {
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+    };
+    localStorage.setItem(LAST_USER_KEY, JSON.stringify(snapshot));
+  } catch { /* localStorage not available (SSR / private mode) */ }
+};
+
+const loadLastUser = (): LastUserSnapshot | null => {
+  try {
+    const raw = localStorage.getItem(LAST_USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const removeLastUser = () => {
+  try { localStorage.removeItem(LAST_USER_KEY); } catch { /* noop */ }
+};
+
+// ─── Provider ─────────────────────────────────────────────────────────────────
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser]               = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [loading, setLoading]         = useState(true);
+  const [lastUser, setLastUser]       = useState<LastUserSnapshot | null>(null);
+
+  // ── Commit a user into state + persist their snapshot ────────────────────
+
+  const commitUser = useCallback((u: User, token: string) => {
+    setAccessToken(token);
+    setUser(u);
+    setLastUser(null);   // hide the popup once they're logged in
+    saveLastUser(u);     // update the snapshot for next visit
+  }, []);
+
+  // ── Fetch user profile with a given token ────────────────────────────────
+
+  const fetchUser = useCallback(async (token: string): Promise<User | null> => {
+    try {
+      const res = await fetch(`${API}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.user;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // ── On mount: silently try to restore session, then load last-user ───────
+
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const res = await fetch(`${API}/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          // Session restored — log in immediately (no popup needed)
+          commitUser(data.user, data.accessToken);
+          return;
+        }
+      } catch { /* network error — treat as no session */ }
+
+      // No active session — read the last-user snapshot to show the popup
+      const snapshot = loadLastUser();
+      setLastUser(snapshot);
+
+      setLoading(false);
+    };
+    restoreSession();
+  }, [commitUser]);
+
+  // When commitUser runs (session restored), we can stop loading
+  useEffect(() => {
+    if (user) setLoading(false);
+  }, [user]);
+
+  // ── Login ─────────────────────────────────────────────────────────────────
+
+  const login = async (email: string, password: string) => {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Login failed');
+    commitUser(data.user, data.accessToken);
+  };
+
+  // ── Logout ────────────────────────────────────────────────────────────────
+
+  const logout = async () => {
+    await fetch(`${API}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    setAccessToken(null);
+    setUser(null);
+    // Keep lastUser so the popup re-appears next time they visit
+  };
+
+  // ── Refresh user profile from DB ─────────────────────────────────────────
+
+  const refreshUser = async () => {
+    if (!accessToken) return;
+    const updated = await fetchUser(accessToken);
+    if (updated) {
+      setUser(updated);
+      saveLastUser(updated);
+    }
+  };
+
+  // ── Called from OAuth callback page ──────────────────────────────────────
+
+  const setTokenFromOAuth = async (token: string) => {
+    const u = await fetchUser(token);
+    if (u) commitUser(u, token);
+  };
+
+  // ── Dismiss the popup and forget the last user ───────────────────────────
+
+  const clearLastUser = () => {
+    removeLastUser();
+    setLastUser(null);
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        accessToken,
+        loading,
+        lastUser,
+        login,
+        logout,
+        refreshUser,
+        setTokenFromOAuth,
+        clearLastUser,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
