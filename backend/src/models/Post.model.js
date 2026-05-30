@@ -56,12 +56,12 @@ const postSchema = new mongoose.Schema(
 
     htmlContent: {
       type: String,
-      required: [true, 'Post content is required'],
+      required: function() { return this.status === 'PUBLISHED'; },
     },
 
     category: {
       type: String,
-      required: [true, 'Category is required'],
+      required: function() { return this.status === 'PUBLISHED'; },
       trim: true,
     },
 
@@ -73,7 +73,7 @@ const postSchema = new mongoose.Schema(
 
     excerpt: {
       type: String,
-      required: [true, 'Excerpt is required'],
+      required: function() { return this.status === 'PUBLISHED'; },
       trim: true,
       maxlength: [500, 'Excerpt cannot exceed 500 characters'],
     },
@@ -91,6 +91,12 @@ const postSchema = new mongoose.Schema(
         message: 'Status must be either DRAFT or PUBLISHED',
       },
       default: 'DRAFT',
+    },
+
+    views: {
+      type: Number,
+      default: 0,
+      index: true,
     },
 
     authorId: {

@@ -61,6 +61,17 @@ const userSchema = new mongoose.Schema(
       default: null,
       index: { sparse: true },
     },
+
+    resetPasswordToken: {
+      type: String,
+      default: null,
+      index: { sparse: true },
+    },
+
+    resetPasswordExpires: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt automatically
@@ -107,6 +118,8 @@ userSchema.statics.hashPassword = async function (plainPassword) {
 userSchema.set('toJSON', {
   transform: (_doc, ret) => {
     delete ret.passwordHash;
+    delete ret.resetPasswordToken;
+    delete ret.resetPasswordExpires;
     delete ret.__v;
     return ret;
   },

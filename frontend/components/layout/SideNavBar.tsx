@@ -2,14 +2,11 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
+import { usePathname } from 'next/navigation';
 import { useUIStore } from '@/lib/ui-store';
 
 export default function SideNavBar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, logout } = useAuth();
   const { sidebarOpen, setSidebarOpen } = useUIStore();
 
   // Screen size detection: default to closed on mobile and open on desktop
@@ -42,14 +39,6 @@ export default function SideNavBar() {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setSidebarOpen(false);
     }
-  };
-
-  const handleLogout = async () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      setSidebarOpen(false);
-    }
-    await logout();
-    router.push('/');
   };
 
   return (
@@ -110,31 +99,6 @@ export default function SideNavBar() {
           </div>
         </div>
 
-        {/* Bottom Profile / Sign out Section */}
-        {user && (
-          <div className="border-t border-outline-variant/20 pt-4 flex flex-col gap-3">
-            <div className="flex items-center gap-3 px-2">
-              <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border border-outline-variant/30 shrink-0">
-                {user.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="font-label-caps text-on-surface text-sm">{user.name.charAt(0).toUpperCase()}</span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-body-md text-sm font-bold text-on-surface truncate">{user.name}</p>
-                <p className="font-body-md text-xs text-on-surface-variant truncate">{user.email}</p>
-              </div>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 px-3 py-2.5 text-sm text-error hover:bg-error-container/20 rounded-xl transition-all w-full text-left font-medium active:scale-95 cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[20px]">logout</span>
-              <span>Sign out</span>
-            </button>
-          </div>
-        )}
       </nav>
     </>
   );

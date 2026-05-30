@@ -161,6 +161,12 @@ export const getBySlug = async (req, res) => {
     if (!requesterId || requesterId !== authorId) {
       throw new AppError('Post not found.', 404); // Intentionally vague — don't reveal draft existence
     }
+  } else {
+    // Increment view count asynchronously in the background for high performance
+    Post.updateOne({ _id: post._id }, { $inc: { views: 1 } }).catch(err => {
+      console.error('Failed to increment post views:', err);
+    });
+    post.views = (post.views || 0) + 1;
   }
 
   res.status(200).json({ success: true, data: post });
@@ -184,18 +190,37 @@ export const getMyPosts = async (req, res) => {
     filter.status = status.toUpperCase();
   }
 
-  const [posts, total] = await Promise.all([
+  // Compile overall creator analytics using MongoDB Aggregation Pipeline
+  const [posts, total, analyticsResult] = await Promise.all([
     Post.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean(),
     Post.countDocuments(filter),
+    Post.aggregate([
+      { $match: { authorId: req.user._id } },
+      {
+        $group: {
+          _id: null,
+          totalViews: { $sum: '$views' },
+          publishedCount: { $sum: { $cond: [{ $eq: ['$status', 'PUBLISHED'] }, 1, 0] } },
+          draftsCount: { $sum: { $cond: [{ $eq: ['$status', 'DRAFT'] }, 1, 0] } },
+        },
+      },
+    ]),
   ]);
+
+  const analytics = analyticsResult[0] || {
+    totalViews: 0,
+    publishedCount: 0,
+    draftsCount: 0,
+  };
 
   res.status(200).json({
     success: true,
     data: posts,
+    analytics,
     pagination: {
       page,
       limit,

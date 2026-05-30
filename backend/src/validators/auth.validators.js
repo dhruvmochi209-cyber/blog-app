@@ -76,3 +76,43 @@ export const loginSchema = z.object({
       .min(1, 'Password cannot be empty'),
   }),
 });
+
+// ─── Forgot Password ──────────────────────────────────────────────────────────
+
+export const forgotPasswordSchema = z.object({
+  body: z.object({
+    email: z
+      .string({ required_error: 'Email is required' })
+      .trim()
+      .toLowerCase()
+      .email('Please provide a valid email address'),
+  }),
+});
+
+// ─── Reset Password ─────────────────────────────────────────────────────────────
+
+export const resetPasswordSchema = z.object({
+  body: z.object({
+    email: z
+      .string({ required_error: 'Email is required' })
+      .trim()
+      .toLowerCase()
+      .email('Please provide a valid email address'),
+
+    otp: z
+      .string({ required_error: 'OTP is required' })
+      .trim()
+      .length(6, 'OTP must be exactly 6 digits')
+      .regex(/^\d{6}$/, 'OTP must contain only digits'),
+
+    password: z
+      .string({ required_error: 'Password is required' })
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password is too long')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+      ),
+  }),
+});
+

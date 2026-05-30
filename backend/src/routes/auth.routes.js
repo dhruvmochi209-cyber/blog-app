@@ -12,6 +12,8 @@ import {
   googleCallback,
   githubCallback,
   googleOneTap,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/auth.controller.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
@@ -20,6 +22,8 @@ import {
   verifyOtpSchema,
   resendOtpSchema,
   loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../validators/auth.validators.js';
 
 const router = Router();
@@ -93,6 +97,12 @@ router.post(
 
 /** POST /api/auth/login */
 router.post('/login', authLimiter, validate(loginSchema), login);
+
+/** POST /api/auth/forgot-password */
+router.post('/forgot-password', authLimiter, validate(forgotPasswordSchema), forgotPassword);
+
+/** POST /api/auth/reset-password */
+router.post('/reset-password', authLimiter, validate(resetPasswordSchema), resetPassword);
 
 /** POST /api/auth/refresh */
 router.post('/refresh', refreshLimiter, refresh);

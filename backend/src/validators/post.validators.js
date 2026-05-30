@@ -15,20 +15,21 @@ export const createPostSchema = z.object({
       .max(200, 'Title cannot exceed 200 characters'),
 
     htmlContent: z
-      .string({ required_error: 'Content is required' })
-      .min(10, 'Content is too short'),
+      .string()
+      .optional()
+      .or(z.literal('')),
 
     category: z
-      .string({ required_error: 'Category is required' })
+      .string()
       .trim()
-      .min(2, 'Category must be at least 2 characters')
-      .max(50, 'Category cannot exceed 50 characters'),
+      .optional()
+      .or(z.literal('')),
 
     excerpt: z
-      .string({ required_error: 'Excerpt is required' })
+      .string()
       .trim()
-      .min(10, 'Excerpt must be at least 10 characters')
-      .max(500, 'Excerpt cannot exceed 500 characters'),
+      .optional()
+      .or(z.literal('')),
 
     coverImage: z
       .string()
@@ -50,6 +51,30 @@ export const createPostSchema = z.object({
       })
       .optional()
       .default('DRAFT'),
+  }).superRefine((data, ctx) => {
+    if (data.status === 'PUBLISHED') {
+      if (!data.htmlContent || data.htmlContent.trim().length < 10) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['htmlContent'],
+          message: 'Content is required and must be at least 10 characters',
+        });
+      }
+      if (!data.category || data.category.trim().length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['category'],
+          message: 'Category is required and must be at least 2 characters',
+        });
+      }
+      if (!data.excerpt || data.excerpt.trim().length < 10) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['excerpt'],
+          message: 'Excerpt is required and must be at least 10 characters',
+        });
+      }
+    }
   }),
 });
 
@@ -66,22 +91,20 @@ export const updatePostSchema = z.object({
 
     htmlContent: z
       .string()
-      .min(10, 'Content is too short')
-      .optional(),
+      .optional()
+      .or(z.literal('')),
 
     category: z
       .string()
       .trim()
-      .min(2, 'Category must be at least 2 characters')
-      .max(50, 'Category cannot exceed 50 characters')
-      .optional(),
+      .optional()
+      .or(z.literal('')),
 
     excerpt: z
       .string()
       .trim()
-      .min(10, 'Excerpt must be at least 10 characters')
-      .max(500, 'Excerpt cannot exceed 500 characters')
-      .optional(),
+      .optional()
+      .or(z.literal('')),
 
     coverImage: z
       .string()
@@ -101,6 +124,30 @@ export const updatePostSchema = z.object({
         errorMap: () => ({ message: 'Status must be DRAFT or PUBLISHED' }),
       })
       .optional(),
+  }).superRefine((data, ctx) => {
+    if (data.status === 'PUBLISHED') {
+      if (data.htmlContent !== undefined && data.htmlContent.trim().length < 10) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['htmlContent'],
+          message: 'Content must be at least 10 characters',
+        });
+      }
+      if (data.category !== undefined && data.category.trim().length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['category'],
+          message: 'Category must be at least 2 characters',
+        });
+      }
+      if (data.excerpt !== undefined && data.excerpt.trim().length < 10) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['excerpt'],
+          message: 'Excerpt must be at least 10 characters',
+        });
+      }
+    }
   }),
 });
 

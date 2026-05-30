@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth-context';
+import ProfileDropdown from '@/components/layout/ProfileDropdown';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -75,6 +76,124 @@ export default function WritePage() {
   const publishingRef = useRef(false);
   const [showPreview, setShowPreview] = useState(false);
   const [createdPost, setCreatedPost] = useState<any>(null);
+
+  // ── Auto-Save and Draft States ──
+  const [postId, setPostId] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'saving' | 'saved' | 'offline_saved' | 'error'>('idle');
+  const [showManualSavedTick, setShowManualSavedTick] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const lastSavedRef = useRef<string>('');
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close more menu on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+        setShowMoreMenu(false);
+      }
+    };
+    if (showMoreMenu) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showMoreMenu]);
+
+  // ── Database Fetch Draft Routine ──
+  const fetchPostFromDatabase = async (id: string) => {
+    if (!accessToken) return;
+    setSyncStatus('saving');
+    try {
+      const res = await fetch(`${API_BASE}/posts/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      const resData = await res.json();
+
+      if (resData.success) {
+        const post = resData.data;
+        setPostId(post._id);
+        setTitle(post.title || '');
+        setCategory(post.category || '');
+        setCoverImage(post.coverImage || '');
+        setExcerpt(post.excerpt || '');
+        setKeywords(post.seoKeywords || '');
+        setContent(post.htmlContent || '');
+        
+        // Reconstruct active blocks dynamically based on database properties
+        const blocks: BlockType[] = [];
+        if (post.category) blocks.push('category');
+        if (post.coverImage) blocks.push('coverImage');
+        if (post.excerpt) blocks.push('excerpt');
+        if (post.seoKeywords) blocks.push('keywords');
+        if (post.htmlContent) blocks.push('content');
+        setActiveBlocks(blocks);
+
+        lastSavedRef.current = JSON.stringify({
+          title: post.title || '',
+          category: post.category || '',
+          coverImage: post.coverImage || '',
+          excerpt: post.excerpt || '',
+          keywords: post.seoKeywords || '',
+          content: post.htmlContent || '',
+        });
+        setSyncStatus('saved');
+      } else {
+        setErrors({ submit: resData.message || 'Failed to load article draft.' });
+        setSyncStatus('error');
+      }
+    } catch (err) {
+      console.error(err);
+      setErrors({ submit: 'Failed to connect to backend server. Draft could not be loaded.' });
+      setSyncStatus('error');
+    }
+  };
+
+  // Load draft on mount (priority: query param id > localStorage backup)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      
+      if (id) {
+        if (accessToken) {
+          fetchPostFromDatabase(id);
+        }
+      } else {
+        // Fallback to localStorage draft check
+        const savedDraft = localStorage.getItem('writen_offline_draft');
+        if (savedDraft) {
+          try {
+            const draft = JSON.parse(savedDraft);
+            if (draft.title || draft.content) {
+              const confirmRestore = window.confirm('We found an unsaved draft in your browser. Would you like to restore it?');
+              if (confirmRestore) {
+                setPostId(draft.postId ?? null);
+                setTitle(draft.title ?? '');
+                setCategory(draft.category ?? '');
+                setCoverImage(draft.coverImage ?? '');
+                setExcerpt(draft.excerpt ?? '');
+                setKeywords(draft.keywords ?? '');
+                setContent(draft.content ?? '');
+                setActiveBlocks(draft.activeBlocks ?? []);
+                lastSavedRef.current = JSON.stringify({
+                  title: draft.title,
+                  category: draft.category,
+                  coverImage: draft.coverImage,
+                  excerpt: draft.excerpt,
+                  keywords: draft.keywords,
+                  content: draft.content,
+                });
+                setSyncStatus('saved');
+              } else {
+                localStorage.removeItem('writen_offline_draft');
+              }
+            }
+          } catch (e) {
+            console.error('Error restoring draft:', e);
+          }
+        }
+      }
+    }
+  }, [accessToken]);
 
   // Auto-generated slug
   const slug = useMemo(() => slugify(title), [title]);
@@ -230,10 +349,14 @@ export default function WritePage() {
     if (!validate()) return;
     publishingRef.current = true;
     setPublishing(true);
+    setSyncStatus('saving');
 
     try {
-      const res = await fetch(`${API_BASE}/posts`, {
-        method: 'POST',
+      const url = postId ? `${API_BASE}/posts/${postId}` : `${API_BASE}/posts`;
+      const method = postId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
@@ -254,12 +377,19 @@ export default function WritePage() {
       if (resData.success) {
         setCreatedPost(resData.data);
         setShowPreview(true); // Show Preview Overlay
+        setSyncStatus('saved');
         
+        // Clear local storage offline draft once successfully published
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('writen_offline_draft');
+        }
+
         // Promote Visitor to Creator role inside Auth Context immediately
         if (resData.roleUpgraded) {
           await refreshUser();
         }
       } else {
+        setSyncStatus('error');
         if (resData.errors && Array.isArray(resData.errors)) {
           const newErrors: Record<string, string> = {};
           resData.errors.forEach((err: any) => {
@@ -272,6 +402,7 @@ export default function WritePage() {
       }
     } catch (err) {
       console.error(err);
+      setSyncStatus('error');
       setErrors({ submit: 'An unexpected connection error occurred. Make sure the backend server is running on port 5001.' });
     } finally {
       publishingRef.current = false;
@@ -279,9 +410,177 @@ export default function WritePage() {
     }
   };
 
-  const handleSaveDraft = () => {
-    console.log('Saving draft…', { title, activeBlocks, content });
+  // ── Auto-Save Draft Handler ──
+  const autoSaveDraft = async () => {
+    if (publishingRef.current || (!title.trim() && !content.trim())) return;
+
+    const currentPayload = JSON.stringify({
+      title,
+      category,
+      coverImage,
+      excerpt,
+      keywords,
+      content,
+    });
+    
+    if (currentPayload === lastSavedRef.current) {
+      return; // Unchanged
+    }
+
+    setSyncStatus('saving');
+
+    const payload = {
+      title: title.trim() || 'Untitled Draft',
+      htmlContent: content,
+      category: category || 'Other',
+      excerpt: excerpt || 'Draft excerpt...',
+      coverImage: coverImage,
+      seoKeywords: keywords,
+      status: 'DRAFT',
+    };
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('writen_offline_draft', JSON.stringify({
+        postId,
+        title,
+        category,
+        coverImage,
+        excerpt,
+        keywords,
+        content,
+        activeBlocks,
+      }));
+    }
+
+    try {
+      const url = postId ? `${API_BASE}/posts/${postId}` : `${API_BASE}/posts`;
+      const method = postId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await res.json();
+
+      if (resData.success) {
+        if (!postId && resData.data?._id) {
+          setPostId(resData.data._id);
+        }
+        lastSavedRef.current = currentPayload;
+        setSyncStatus('saved');
+        
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('writen_offline_draft', JSON.stringify({
+            postId: resData.data?._id || postId,
+            title,
+            category,
+            coverImage,
+            excerpt,
+            keywords,
+            content,
+            activeBlocks,
+          }));
+        }
+      } else {
+        console.error('Auto-save rejected:', resData.message);
+        setSyncStatus('offline_saved');
+      }
+    } catch (err) {
+      console.error('Auto-save network error:', err);
+      setSyncStatus('offline_saved');
+    }
   };
+
+  // ── Manual Save Draft Trigger ──
+  const handleSaveDraft = async () => {
+    if (syncStatus === 'saving') return;
+    setSyncStatus('saving');
+
+    const currentPayload = JSON.stringify({
+      title,
+      category,
+      coverImage,
+      excerpt,
+      keywords,
+      content,
+    });
+
+    const payload = {
+      title: title.trim() || 'Untitled Draft',
+      htmlContent: content,
+      category: category || 'Other',
+      excerpt: excerpt || 'Draft excerpt...',
+      coverImage: coverImage,
+      seoKeywords: keywords,
+      status: 'DRAFT',
+    };
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('writen_offline_draft', JSON.stringify({
+        postId,
+        title,
+        category,
+        coverImage,
+        excerpt,
+        keywords,
+        content,
+        activeBlocks,
+      }));
+    }
+
+    try {
+      const url = postId ? `${API_BASE}/posts/${postId}` : `${API_BASE}/posts`;
+      const method = postId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await res.json();
+
+      if (resData.success) {
+        if (!postId && resData.data?._id) {
+          setPostId(resData.data._id);
+        }
+        lastSavedRef.current = currentPayload;
+        setSyncStatus('saved');
+        setShowManualSavedTick(true);
+        setTimeout(() => {
+          setShowManualSavedTick(false);
+        }, 2000);
+      } else {
+        setSyncStatus('error');
+      }
+    } catch (err) {
+      console.error(err);
+      setSyncStatus('offline_saved');
+      setShowManualSavedTick(true);
+      setTimeout(() => {
+        setShowManualSavedTick(false);
+      }, 2000);
+    }
+  };
+
+  // ── Auto-Save Effect Watcher ──
+  useEffect(() => {
+    if (publishing || (!title.trim() && !content.trim())) return;
+
+    const timer = setTimeout(() => {
+      autoSaveDraft();
+    }, 2000); // 2000ms debounce
+
+    return () => clearTimeout(timer);
+  }, [title, category, coverImage, excerpt, keywords, content, publishing]);
 
   const insertOptions = [
     { type: 'category' as BlockType, icon: 'category', label: 'Category Picker' },
@@ -299,16 +598,39 @@ export default function WritePage() {
           <Link href="/feed" className="font-headline-lg text-xl font-bold text-on-surface tracking-tight hover:opacity-90">
             Writen
           </Link>
-          <span className="font-label-caps text-xs text-on-surface-variant px-2.5 py-0.5 bg-surface-container rounded-md border border-outline-variant/10">Draft</span>
+          {/* Dynamic Sync Status Indicator */}
+          {syncStatus === 'idle' && (
+            <span className="font-label-caps text-xs text-on-surface-variant px-2.5 py-0.5 bg-surface-container rounded-md border border-outline-variant/10 select-none">
+              Draft
+            </span>
+          )}
+          {syncStatus === 'saving' && (
+            <span className="font-label-caps text-xs text-on-surface-variant/80 px-2.5 py-0.5 bg-surface-container rounded-md border border-outline-variant/10 select-none flex items-center gap-1.5 animate-pulse">
+              <span className="material-symbols-outlined animate-spin text-[14px]">progress_activity</span>
+              Saving...
+            </span>
+          )}
+          {syncStatus === 'saved' && (
+            <span className="font-label-caps text-xs text-primary bg-primary/10 px-2.5 py-0.5 rounded-md border border-primary/20 select-none flex items-center gap-1.5 font-semibold">
+              <span className="material-symbols-outlined text-[15px]">cloud_done</span>
+              Saved to cloud
+            </span>
+          )}
+          {syncStatus === 'offline_saved' && (
+            <span className="font-label-caps text-xs text-tertiary bg-tertiary/10 px-2.5 py-0.5 rounded-md border border-tertiary/20 select-none flex items-center gap-1.5 font-semibold">
+              <span className="material-symbols-outlined text-[15px]">offline_pin</span>
+              Saved locally (offline)
+            </span>
+          )}
+          {syncStatus === 'error' && (
+            <span className="font-label-caps text-xs text-error bg-error/10 px-2.5 py-0.5 rounded-md border border-error/20 select-none flex items-center gap-1.5 font-semibold">
+              <span className="material-symbols-outlined text-[15px]">warning</span>
+              Save failed
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={handleSaveDraft}
-            className="font-label-caps text-xs text-on-surface-variant hover:text-on-surface px-4 py-2 rounded-full border border-outline-variant/30 hover:bg-surface-container-low transition-all"
-          >
-            Save Draft
-          </button>
           <button
             onClick={handlePublish}
             disabled={publishing}
@@ -319,21 +641,58 @@ export default function WritePage() {
             ) : null}
             Publish
           </button>
-          <button className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
-            <span className="material-symbols-outlined text-[20px]">more_horiz</span>
-          </button>
+          
+          {/* More Actions Dropdown Menu */}
+          <div className="relative" ref={moreMenuRef}>
+            <button
+              onClick={() => setShowMoreMenu(!showMoreMenu)}
+              className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors cursor-pointer active:scale-95 transition-transform"
+              title="More Actions"
+            >
+              <span className="material-symbols-outlined text-[20px]">more_horiz</span>
+            </button>
+
+            {showMoreMenu && (
+              <div className="absolute right-0 top-11 w-48 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                <Link
+                  href="/feed"
+                  onClick={() => setShowMoreMenu(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[18px]">home</span>
+                  Home
+                </Link>
+                
+                <button
+                  onClick={() => {
+                    setShowMoreMenu(false);
+                    handleSaveDraft();
+                  }}
+                  disabled={syncStatus === 'saving' || publishing}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer w-full text-left disabled:opacity-60 focus:outline-none"
+                >
+                  {syncStatus === 'saving' ? (
+                    <span className="material-symbols-outlined animate-spin text-[18px] text-on-surface-variant/70">progress_activity</span>
+                  ) : showManualSavedTick ? (
+                    <span className="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[18px] text-on-surface-variant/70">save</span>
+                  )}
+                  <span>
+                    {syncStatus === 'saving' 
+                      ? 'Saving...' 
+                      : showManualSavedTick 
+                        ? 'Saved!' 
+                        : 'Save Draft'}
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
           <button className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
             <span className="material-symbols-outlined text-[20px]">notifications</span>
           </button>
-          {user && (
-            <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant/30 cursor-pointer">
-              {user.avatar ? (
-                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="font-label-caps text-on-surface text-xs">{user.name.charAt(0).toUpperCase()}</span>
-              )}
-            </div>
-          )}
+          {user && <ProfileDropdown />}
         </div>
       </header>
 
