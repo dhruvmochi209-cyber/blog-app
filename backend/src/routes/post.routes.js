@@ -9,6 +9,7 @@ import {
   deletePost,
   toggleStatus,
   getCategories,
+  getRelatedPosts,
 } from '../controllers/post.controller.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
@@ -95,6 +96,12 @@ router.delete('/:id', verifyToken, deletePost);
  * The "live switch" from the dashboard table row.
  */
 router.patch('/:id/status', verifyToken, validate(toggleStatusSchema), toggleStatus);
+
+/**
+ * GET /api/posts/:id/related
+ * Fetch related posts for a blog article.
+ */
+router.get('/:id/related', getRelatedPosts);
 
 /**
  * GET /api/posts/:slug

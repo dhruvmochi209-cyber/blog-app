@@ -14,6 +14,9 @@ import User from '../models/User.model.js';
  * serializeUser / deserializeUser are minimal no-ops required by passport internals.
  */
 
+console.log("CLIENT ID:", process.env.GOOGLE_CLIENT_ID);
+console.log("CLIENT SECRET:", process.env.GOOGLE_CLIENT_SECRET);
+
 // ─── Google Strategy ────────────────────────────────────────────────────────
 
 passport.use(

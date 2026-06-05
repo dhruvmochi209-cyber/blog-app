@@ -3,45 +3,34 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth-context';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Code2, Palette, Rocket, Cpu, Check, ArrowRight } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [showSplash, setShowSplash] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
-  // Splash screen timer — give enough time for the full animation, then redirect straight to feed
-  useEffect(() => {
-    const hideTimer = setTimeout(() => {
-      router.push('/feed');
-    }, 3500);
-    return () => clearTimeout(hideTimer);
-  }, [router]);
-
-  const appName = 'Writen';
-  const taglineWords = ['Where', 'ideas', 'take', 'shape.'];
 
   const categories = [
     {
       name: "Engineering",
-      icon: "code_blocks",
+      icon: <Code2 className="size-5.5 text-primary" />,
       tags: ["React", "Node.js", "System Design", "DevOps", "Python", "GraphQL", "WebAssembly", "Rust", "TypeScript", "Docker"]
     },
     {
       name: "Design",
-      icon: "palette",
+      icon: <Palette className="size-5.5 text-primary" />,
       tags: ["UX", "UI", "Typography", "Figma", "Design Systems", "Accessibility", "Motion Design", "Branding"]
     },
     {
       name: "Product",
-      icon: "rocket_launch",
+      icon: <Rocket className="size-5.5 text-primary" />,
       tags: ["Strategy", "Management", "Agile", "User Research", "Metrics", "Growth", "Analytics"]
     },
     {
       name: "AI & Machine Learning",
-      icon: "smart_toy",
+      icon: <Cpu className="size-5.5 text-primary" />,
       tags: ["LLMs", "Computer Vision", "NLP", "MLOps", "Deep Learning", "Generative AI"]
     }
   ];
@@ -64,235 +53,174 @@ export default function OnboardingPage() {
     router.push('/feed');
   };
 
-  // ── Splash Screen ──
-  // Rendered via AnimatePresence so we get a smooth exit animation
-  if (showSplash) {
-    return (
-      <AnimatePresence>
-        {showSplash && (
-          <motion.div
-            key="splash"
-            className="fixed inset-0 z-[100] bg-surface flex flex-col items-center justify-center overflow-hidden"
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.6, ease: 'easeInOut' }}
-          >
-            {/* Animated radial glow */}
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.5 }}
-              style={{
-                background: 'radial-gradient(circle at 50% 45%, rgba(0, 109, 56, 0.08) 0%, transparent 55%)'
-              }}
-            />
+  // Calculate selection progress percent (up to 3 tags = 100%)
+  const progressPercent = Math.min(100, (selectedTags.length / 3) * 100);
 
-            {/* Orbiting decorative ring */}
-            <motion.div
-              className="absolute w-[500px] h-[500px] rounded-full border border-primary/10"
-              initial={{ opacity: 0, scale: 0.5, rotate: 0 }}
-              animate={{ opacity: 1, scale: 1, rotate: 360 }}
-              transition={{ duration: 3, ease: 'easeOut' }}
-            >
-              <motion.div
-                className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary/30 rounded-full"
-                animate={{ boxShadow: ['0 0 10px rgba(0,109,56,0.3)', '0 0 25px rgba(0,109,56,0.6)', '0 0 10px rgba(0,109,56,0.3)'] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </motion.div>
-
-            {/* Inner ring */}
-            <motion.div
-              className="absolute w-[300px] h-[300px] rounded-full border border-outline-variant/20"
-              initial={{ opacity: 0, scale: 0.3, rotate: 0 }}
-              animate={{ opacity: 0.6, scale: 1, rotate: -180 }}
-              transition={{ duration: 3, ease: 'easeOut', delay: 0.3 }}
-            />
-
-            {/* Main content */}
-            <div className="relative z-10 flex flex-col items-center">
-              {/* Letter-by-letter app name */}
-              <div className="flex items-baseline overflow-hidden">
-                {appName.split('').map((letter, i) => (
-                  <motion.span
-                    key={i}
-                    className="font-headline-lg text-6xl md:text-8xl font-bold text-on-surface inline-block"
-                    initial={{ y: 80, opacity: 0, rotateX: -90 }}
-                    animate={{ y: 0, opacity: 1, rotateX: 0 }}
-                    transition={{
-                      delay: 0.15 + i * 0.1,
-                      duration: 0.7,
-                      ease: [0.16, 1, 0.3, 1],
-                    }}
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
-              </div>
-
-              {/* Glowing underline sweep */}
-              <motion.div
-                className="h-[3px] bg-gradient-to-r from-transparent via-primary to-transparent rounded-full mt-2"
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: '120%', opacity: 1 }}
-                transition={{ delay: 1, duration: 0.8, ease: 'easeOut' }}
-              />
-
-              {/* Tagline — word by word */}
-              <div className="flex gap-2 mt-6">
-                {taglineWords.map((word, i) => (
-                  <motion.span
-                    key={i}
-                    className="font-body-md text-lg md:text-xl text-secondary italic"
-                    initial={{ opacity: 0, y: 15, filter: 'blur(8px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{
-                      delay: 1.4 + i * 0.2,
-                      duration: 0.5,
-                      ease: 'easeOut',
-                    }}
-                  >
-                    {word}
-                  </motion.span>
-                ))}
-              </div>
-
-              {/* Subtle loading bar */}
-              <motion.div
-                className="mt-10 h-[2px] bg-outline-variant/20 rounded-full overflow-hidden w-32"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 2.2 }}
-              >
-                <motion.div
-                  className="h-full bg-primary/60 rounded-full"
-                  initial={{ width: '0%' }}
-                  animate={{ width: '100%' }}
-                  transition={{ delay: 2.2, duration: 1.2, ease: 'easeInOut' }}
-                />
-              </motion.div>
-            </div>
-
-            {/* Corner decorative dots */}
-            {[
-              { className: 'top-[20%] left-[15%]', delay: 0.5 },
-              { className: 'top-[30%] right-[18%]', delay: 0.8 },
-              { className: 'bottom-[25%] left-[22%]', delay: 1.1 },
-              { className: 'bottom-[20%] right-[12%]', delay: 0.7 },
-            ].map((dot, i) => (
-              <motion.div
-                key={i}
-                className={`absolute ${dot.className} w-1.5 h-1.5 rounded-full bg-primary/25`}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: [0, 1.5, 1] }}
-                transition={{ delay: dot.delay, duration: 0.6 }}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    );
-  }
-
-  // ── Category Selection ──
   return (
-    <div className="min-h-screen bg-surface flex flex-col animate-in fade-in duration-500 fill-mode-both">
-      
-      {/* Minimal Header */}
-      <header className="border-b border-outline-variant/30 py-4 px-6 flex justify-between items-center bg-surface sticky top-0 z-50">
-        <Link href="/feed" className="font-headline-lg text-xl font-bold text-on-surface">Writen</Link>
-        <span className="font-label-caps text-sm text-on-surface-variant">Personalize your feed</span>
+    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
+      {/* hoisted document metadata for SEO */}
+      <title>Welcome // Onboarding Writen</title>
+      <meta name="description" content="Personalize your Writen feed. Select your fields of interest from engineering, design, systems architecture, products, and AI." />
+
+      {/* Glassmorphic Header */}
+      <header className="border-b border-outline-variant/30 py-4.5 px-6 flex justify-between items-center bg-background/85 backdrop-blur-md sticky top-0 z-50 shadow-xs">
+        <Link href="/feed" className="font-headline-md text-xl font-bold text-on-surface tracking-tight hover:opacity-85 transition-opacity">
+          Writen
+        </Link>
+        <span className="font-label-caps text-xs text-on-surface-variant font-bold uppercase tracking-wider select-none">
+          Personalize your feed
+        </span>
       </header>
 
-      <main className="flex-1 max-w-[800px] w-full mx-auto px-6 py-12 md:py-20">
-        <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-          <h1 className="font-headline-lg text-4xl font-bold text-on-surface mb-4">What are you interested in?</h1>
-          <p className="font-body-md text-xl text-on-surface-variant">Choose at least 3 topics to personalize your feed.</p>
-          <div className="flex gap-3 mt-4">
-            <button onClick={selectAll} className="font-label-caps text-sm text-primary hover:underline transition-colors">Select all</button>
+      {/* Main Form Area */}
+      <main className="flex-1 max-w-[800px] w-full mx-auto px-6 py-12 md:py-16 pb-32">
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 select-none"
+        >
+          <h1 className="font-display-xl text-3xl md:text-4xl font-black text-on-surface tracking-tight mb-3">
+            What are your interests?
+          </h1>
+          <p className="font-body-md text-base text-on-surface-variant font-light">
+            Choose at least <strong className="font-semibold text-primary">3 topics</strong> to align your narrative index feed.
+          </p>
+          <div className="flex gap-4 mt-5">
+            <button 
+              onClick={selectAll} 
+              className="font-label-caps text-xs font-bold uppercase tracking-wider text-primary hover:underline transition-colors focus:outline-none"
+            >
+              Select all
+            </button>
             {selectedTags.length > 0 && (
-              <button onClick={clearAll} className="font-label-caps text-sm text-on-surface-variant hover:text-on-surface transition-colors">Clear all</button>
+              <button 
+                onClick={clearAll} 
+                className="font-label-caps text-xs font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors focus:outline-none"
+              >
+                Clear all
+              </button>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Categories grid */}
-        <div className="space-y-12 mb-20">
+        <motion.div 
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1
+              }
+            }
+          }}
+          className="space-y-12"
+        >
           {categories.map((category, catIdx) => (
-            <div
+            <motion.div
               key={category.name}
-              className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both"
-              style={{ animationDelay: `${200 + catIdx * 100}ms` }}
+              variants={{
+                hidden: { opacity: 0, y: 15 },
+                show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 25 } }
+              }}
+              className="border-b border-outline-variant/15 last:border-b-0 pb-8 last:pb-0"
             >
-              <div className="flex items-center gap-3 mb-6 border-b border-outline-variant/30 pb-2">
-                <span className="material-symbols-outlined text-primary text-2xl">{category.icon}</span>
-                <h2 className="font-headline-md text-2xl font-semibold text-on-surface">{category.name}</h2>
+              <div className="flex items-center gap-3 mb-6 pb-2 select-none">
+                <div className="p-2 bg-primary/5 rounded-xl border border-primary/10">
+                  {category.icon}
+                </div>
+                <h2 className="font-headline-md text-xl font-bold text-on-surface tracking-tight">
+                  {category.name}
+                </h2>
               </div>
               
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2.5">
                 {category.tags.map((tag) => {
                   const isSelected = selectedTags.includes(tag);
-                  const isDisabled = false;
                   
                   return (
-                    <button 
+                    <motion.button 
                       key={tag}
                       onClick={() => toggleTag(tag)}
-                      disabled={isDisabled}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      id={`onboarding-tag-${tag.toLowerCase().replace(/\s+/g, '-')}`}
                       className={`
-                        px-5 py-2.5 rounded-full font-body-md text-base transition-all flex items-center gap-2 border
+                        px-4.5 py-2.5 rounded-full font-body-md text-sm transition-all flex items-center gap-1.5 border select-none cursor-pointer font-medium
                         ${isSelected 
-                          ? 'bg-primary text-on-primary border-primary shadow-md scale-105' 
-                          : 'bg-surface border-outline-variant/50 text-on-surface-variant hover:border-primary/50 hover:text-on-surface'
+                          ? 'bg-primary text-on-primary border-primary shadow-xs' 
+                          : 'bg-surface border-outline-variant/40 text-on-surface-variant hover:border-primary/50 hover:text-on-surface hover:bg-surface-container-low/40'
                         }
-                        ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
                       `}
                     >
                       {tag}
-                      {isSelected && <span className="material-symbols-outlined text-[18px]">check</span>}
-                    </button>
+                      <AnimatePresence>
+                        {isSelected && (
+                          <motion.span
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            className="inline-flex items-center justify-center"
+                          >
+                            <Check className="size-3.5" />
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
-
+        </motion.div>
       </main>
 
       {/* Floating Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant/30 p-4 transform transition-transform">
-        <div className="max-w-[800px] mx-auto flex items-center justify-between">
+      <div className="fixed bottom-0 left-0 right-0 glassmorphism py-4.5 px-6 z-40">
+        {/* Dynamic selection progress bar */}
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-outline-variant/20">
+          <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progressPercent}%` }} />
+        </div>
+
+        <div className="max-w-[800px] w-full mx-auto flex items-center justify-between select-none">
           <div>
-            <p className="font-label-caps text-sm text-on-surface-variant">
-              <span className={`font-bold ${selectedTags.length >= 3 ? 'text-primary' : 'text-on-surface'}`}>
+            <p className="font-label-caps text-xs text-on-surface-variant font-bold uppercase tracking-wider">
+              Selected:{' '}
+              <span className={`font-black ${selectedTags.length >= 3 ? 'text-primary' : 'text-on-surface'}`}>
                 {selectedTags.length}
-              </span> / {allTags.length} selected {selectedTags.length < 3 && <span className="text-xs">(min 3)</span>}
+              </span>{' '}
+              / {allTags.length} {selectedTags.length < 3 && <span className="text-[10px] text-secondary font-medium tracking-normal normal-case">(select 3 min)</span>}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          
+          <div className="flex items-center gap-4">
             <button
               onClick={() => router.push('/feed')}
-              className="px-6 py-3 rounded-full font-label-caps text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+              id="onboarding-skip-btn"
+              className="px-5 py-2.5 rounded-full font-label-caps text-xs font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer outline-none"
             >
               Skip
             </button>
+            
             <button 
               onClick={handleComplete}
               disabled={selectedTags.length < 3}
-              className={`px-8 py-3 rounded-full font-label-caps text-sm uppercase transition-all flex items-center gap-2 ${
+              id="onboarding-continue-btn"
+              className={`px-6 py-2.5 rounded-full font-label-caps text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer outline-none ${
                 selectedTags.length >= 3
-                  ? 'bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-md'
-                  : 'bg-surface-variant text-on-surface-variant cursor-not-allowed'
+                  ? 'bg-primary text-on-primary hover:opacity-90 active:scale-95 shadow-sm'
+                  : 'bg-surface-container-high text-on-surface-variant/40 cursor-not-allowed border border-outline-variant/20'
               }`}
             >
               Continue to Feed
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <ArrowRight className="size-3.5" />
             </button>
           </div>
         </div>
       </div>
-      
     </div>
   );
 }

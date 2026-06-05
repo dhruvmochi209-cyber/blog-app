@@ -3,7 +3,7 @@ import app from './src/app.js';
 import connectDB from './src/config/db.js';
 
 const PORT = process.env.PORT || 5001;
-
+console.log(process.env.GOOGLE_CLIENT_ID);
 /**
  * Server bootstrap:
  * 1. Connect to MongoDB.
@@ -13,6 +13,15 @@ const PORT = process.env.PORT || 5001;
 const startServer = async () => {
   // Establish database connection first
   await connectDB();
+
+  // Sync database indexes (drops legacy constraints and registers partial index rules)
+  try {
+    const User = (await import('./src/models/User.model.js')).default;
+    await User.syncIndexes();
+    console.log('🔄 Database indexes synced successfully.');
+  } catch (err) {
+    console.error('❌ Mongoose index sync error:', err.message);
+  }
 
   const server = app.listen(PORT, () => {
     console.log(`\n🚀 Engineering Blog API is running!`);

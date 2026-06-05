@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { LayoutDashboard, User, Bookmark, LogOut } from 'lucide-react';
 
 export default function ProfileDropdown() {
   const { user, logout } = useAuth();
@@ -59,7 +60,7 @@ export default function ProfileDropdown() {
               onClick={() => setShowMenu(false)}
               className="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer font-medium"
             >
-              <span className="material-symbols-outlined text-[18px] text-primary">dashboard</span>
+              <LayoutDashboard className="size-[18px] text-primary" />
               <span>Dashboard</span>
             </Link>
           )}
@@ -68,7 +69,7 @@ export default function ProfileDropdown() {
             onClick={() => setShowMenu(false)}
             className="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[18px]">person</span>
+            <User className="size-[18px]" />
             Profile
           </Link>
           <Link
@@ -76,7 +77,7 @@ export default function ProfileDropdown() {
             onClick={() => setShowMenu(false)}
             className="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[18px]">bookmarks</span>
+            <Bookmark className="size-[18px]" />
             Bookmarks
           </Link>
           <div className="border-t border-outline-variant/20 mt-1 pt-1">
@@ -84,7 +85,7 @@ export default function ProfileDropdown() {
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error-container/30 transition-colors w-full text-left font-medium cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[18px]">logout</span>
+              <LogOut className="size-[18px]" />
               Sign out
             </button>
           </div>

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import authRoutes from './auth.routes.js';
+import userRoutes from './user.routes.js';
 import postRoutes from './post.routes.js';
 import uploadRoutes from './upload.routes.js';
 
@@ -10,10 +11,12 @@ const router = Router();
  * All routes are prefixed with /api in app.js.
  *
  * /api/auth  → Authentication (register, login, OAuth, refresh, logout, me)
+ * /api/users → User specifics (bookmarks, profile)
  * /api/posts → Blog posts (CRUD, public feed, dashboard)
  * /api/uploads → Image uploads (Cloudinary)
  */
 router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
 router.use('/posts', postRoutes);
 router.use('/uploads', uploadRoutes);
 

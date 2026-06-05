@@ -49,18 +49,27 @@ const userSchema = new mongoose.Schema(
       default: null, // URL string — from OAuth provider or custom upload
     },
 
-    // OAuth Provider IDs (sparse = allows multiple nulls in unique index)
+    bio: {
+      type: String,
+      default: null,
+      maxlength: [160, 'Bio cannot exceed 160 characters'],
+    },
+
+    // OAuth Provider IDs
     googleId: {
       type: String,
       default: null,
-      index: { sparse: true },
     },
 
     githubId: {
       type: String,
       default: null,
-      index: { sparse: true },
     },
+
+    bookmarks: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    }],
 
     resetPasswordToken: {
       type: String,
@@ -75,6 +84,24 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // Adds createdAt and updatedAt automatically
+  }
+);
+
+// Ensure googleId is unique only when it is a string (allows multiple nulls)
+userSchema.index(
+  { googleId: 1 },
+  { 
+    unique: true, 
+    partialFilterExpression: { googleId: { $type: "string" } } 
+  }
+);
+
+// Ensure githubId is unique only when it is a string (allows multiple nulls)
+userSchema.index(
+  { githubId: 1 },
+  { 
+    unique: true, 
+    partialFilterExpression: { githubId: { $type: "string" } } 
   }
 );
 

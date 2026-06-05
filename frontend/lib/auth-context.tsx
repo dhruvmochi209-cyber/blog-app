@@ -13,8 +13,10 @@ export interface User {
   email: string;
   role: 'VISITOR' | 'CREATOR';
   avatar: string | null;
+  bio?: string;
   googleId: string | null;
   githubId: string | null;
+  bookmarks?: string[];
   createdAt: string;
 }
 
@@ -35,6 +37,7 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
   setTokenFromOAuth: (token: string) => Promise<void>;
   clearLastUser: () => void;           // ← dismiss the popup permanently
+  toggleBookmark: (postId: string) => Promise<void>;
 }
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -188,6 +191,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLastUser(null);
   };
 
+  // ── Toggle Bookmark ───────────────────────────────────────────────────────
+  
+  const toggleBookmark = async (postId: string) => {
+    if (!accessToken || !user) return;
+    
+    // Optimistic update
+    const isBookmarked = user.bookmarks?.includes(postId);
+    let newBookmarks = [...(user.bookmarks || [])];
+    
+    if (isBookmarked) {
+      newBookmarks = newBookmarks.filter(id => id !== postId);
+    } else {
+      newBookmarks.unshift(postId);
+    }
+    
+    setUser({ ...user, bookmarks: newBookmarks });
+
+    try {
+      const res = await fetch(`${API}/users/bookmarks/${postId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        credentials: 'include'
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        // Sync with actual server state
+        setUser(prev => prev ? { ...prev, bookmarks: data.bookmarks } : null);
+      } else {
+        // Revert on failure
+        setUser({ ...user, bookmarks: user.bookmarks });
+      }
+    } catch (err) {
+      // Revert on failure
+      setUser({ ...user, bookmarks: user.bookmarks });
+      console.error('Failed to toggle bookmark:', err);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -200,6 +242,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshUser,
         setTokenFromOAuth,
         clearLastUser,
+        toggleBookmark,
       }}
     >
       {children}

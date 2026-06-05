@@ -73,10 +73,14 @@ const assertOwnership = async (postId, userId) => {
  */
 export const getAllPublished = async (req, res) => {
   const { page, limit, skip } = parsePagination(req.query);
-  const { category, search } = req.query;
+  const { category, search, authorId, sortBy } = req.query;
 
   // Build filter — only show PUBLISHED posts to the public
   const filter = { status: 'PUBLISHED' };
+
+  if (authorId) {
+    filter.authorId = authorId;
+  }
 
   if (category) {
     filter.category = { $regex: new RegExp(`^${category}$`, 'i') };
@@ -89,10 +93,17 @@ export const getAllPublished = async (req, res) => {
     ];
   }
 
+  const sortObj = {};
+  if (sortBy === 'views') {
+    sortObj.views = -1;
+  } else {
+    sortObj.createdAt = -1;
+  }
+
   const [posts, total] = await Promise.all([
     Post.find(filter)
       .populate('authorId', 'name avatar') // Only expose public author fields
-      .sort({ createdAt: -1 })
+      .sort(sortObj)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -144,7 +155,11 @@ export const getCategories = async (_req, res) => {
 export const getBySlug = async (req, res) => {
   const { slug } = req.params;
 
-  const post = await Post.findOne({ slug })
+  // Allow fetching by _id or slug so the editor can fetch posts by ID directly
+  const isObjectId = /^[a-f\d]{24}$/i.test(slug);
+  const query = isObjectId ? { $or: [{ slug }, { _id: slug }] } : { slug };
+
+  const post = await Post.findOne(query)
     .populate('authorId', 'name avatar role')
     .lean();
 
@@ -191,7 +206,7 @@ export const getMyPosts = async (req, res) => {
   }
 
   // Compile overall creator analytics using MongoDB Aggregation Pipeline
-  const [posts, total, analyticsResult] = await Promise.all([
+  const [posts, total, analyticsResult, categoryBreakdown, monthlyTrend] = await Promise.all([
     Post.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -209,12 +224,39 @@ export const getMyPosts = async (req, res) => {
         },
       },
     ]),
+    Post.aggregate([
+      { $match: { authorId: req.user._id } },
+      {
+        $group: {
+          _id: '$category',
+          count: { $sum: 1 },
+          views: { $sum: '$views' }
+        }
+      },
+      { $sort: { views: -1 } }
+    ]),
+    Post.aggregate([
+      { $match: { authorId: req.user._id, status: 'PUBLISHED' } },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' }
+          },
+          count: { $sum: 1 },
+          views: { $sum: '$views' }
+        }
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1 } }
+    ])
   ]);
 
-  const analytics = analyticsResult[0] || {
-    totalViews: 0,
-    publishedCount: 0,
-    draftsCount: 0,
+  const analytics = {
+    totalViews: analyticsResult[0]?.totalViews || 0,
+    publishedCount: analyticsResult[0]?.publishedCount || 0,
+    draftsCount: analyticsResult[0]?.draftsCount || 0,
+    categories: categoryBreakdown || [],
+    monthlyTrend: monthlyTrend || []
   };
 
   res.status(200).json({
@@ -350,3 +392,52 @@ export const toggleStatus = async (req, res) => {
     data: { _id: post._id, status: post.status },
   });
 };
+
+/**
+ * GET /api/posts/:id/related
+ * Public endpoint to fetch related published posts.
+ * Prioritizes posts in the same category (excluding current post).
+ * Falls back to other recent published posts to ensure a full list.
+ */
+export const getRelatedPosts = async (req, res) => {
+  const { id } = req.params;
+  const limit = Math.min(10, Math.max(1, parseInt(req.query.limit) || 3));
+
+  // Find the post first (by ID or slug)
+  const isObjectId = /^[a-f\d]{24}$/i.test(id);
+  const query = isObjectId ? { $or: [{ slug: id }, { _id: id }] } : { slug: id };
+  const post = await Post.findOne(query).lean();
+
+  if (!post) {
+    throw new AppError('Post not found.', 404);
+  }
+
+  // Find other published posts in the same category, excluding the current one
+  let related = await Post.find({
+    status: 'PUBLISHED',
+    category: post.category,
+    _id: { $ne: post._id },
+  })
+    .populate('authorId', 'name avatar')
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean();
+
+  // If we need more posts to fill the limit, fetch latest published posts
+  if (related.length < limit) {
+    const excludeIds = [post._id, ...related.map((r) => r._id)];
+    const extra = await Post.find({
+      status: 'PUBLISHED',
+      _id: { $nin: excludeIds },
+    })
+      .populate('authorId', 'name avatar')
+      .sort({ createdAt: -1 })
+      .limit(limit - related.length)
+      .lean();
+
+    related = [...related, ...extra];
+  }
+
+  res.status(200).json({ success: true, data: related });
+};
+

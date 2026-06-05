@@ -17,12 +17,22 @@ import nodemailer from 'nodemailer';
  */
 
 const createTransporter = () => {
-  const host = process.env.SMTP_HOST;
-  const port = parseInt(process.env.SMTP_PORT || '465');
-  const secure = process.env.SMTP_SECURE === 'true'; // true = TLS (port 465), false = STARTTLS (port 587)
+  let user = process.env.SMTP_USER || process.env.EMAIL_USER || '';
+  let pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || '';
 
-  const user = process.env.SMTP_USER || '';
-  const pass = process.env.SMTP_PASS || '';
+  let host = process.env.SMTP_HOST;
+
+  // Auto-detect Gmail address to skip manual SMTP host/port settings
+  if (!host && user.endsWith('@gmail.com')) {
+    host = 'smtp.gmail.com';
+  }
+
+  const port = parseInt(process.env.SMTP_PORT || '465');
+
+  // Set TLS/STARTTLS automatically depending on Gmail host or manual setting
+  const secure = process.env.SMTP_SECURE !== undefined
+    ? process.env.SMTP_SECURE === 'true'
+    : (host === 'smtp.gmail.com' && port === 465);
 
   // Detect unconfigured / placeholder credentials
   const isPlaceholder =
