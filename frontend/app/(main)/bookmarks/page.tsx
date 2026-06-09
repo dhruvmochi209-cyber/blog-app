@@ -7,7 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bookmark, Compass, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import TopNavBar from '@/components/layout/TopNavBar';
 import SideNavBar from '@/components/layout/SideNavBar';
+import { PostGridCard } from '@/components/post/PostGridCard';
+import RightSidebar from '@/components/layout/RightSidebar';
 import { useAuth } from '@/lib/auth-context';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
@@ -76,20 +79,17 @@ export default function BookmarksPage() {
   }, [accessToken]);
 
   useEffect(() => {
-    if (!authLoading) {
-      if (!user) {
-        router.push('/login');
-      } else {
-        fetchBookmarks();
-      }
+    if (!authLoading && user) {
+      fetchBookmarks();
     }
-  }, [user, authLoading, router, fetchBookmarks]);
+  }, [user, authLoading, fetchBookmarks]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative font-body-md transition-colors duration-300">
-      <TopNavBar />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-background text-foreground flex flex-col relative font-body-md transition-colors duration-300">
+        <TopNavBar />
 
-      <div className="flex-1 flex w-full">
+      <div className="flex-1 flex w-full pt-16">
         <SideNavBar />
 
         <div className="flex-1 flex justify-center px-4 py-8 md:px-8">
@@ -163,77 +163,15 @@ export default function BookmarksPage() {
                     if (!user?.bookmarks?.includes(post._id)) return null;
 
                     return (
-                      <motion.article
+                      <PostGridCard
                         key={post._id}
-                        variants={{
-                          hidden: { opacity: 0, y: 20 },
-                          show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 25 } }
+                        post={post as any}
+                        isBookmarked={!!user?.bookmarks?.includes(post._id)}
+                        onBookmarkToggle={(id) => {
+                          if (user) toggleBookmark(id);
                         }}
-                        onClick={() => router.push(`/feed/${post.slug}`)}
-                        className="bg-surface border border-outline-variant/30 hover:border-outline-variant/60 rounded-2xl overflow-hidden flex flex-col group cursor-pointer shadow-xs hover:shadow-md transition-all duration-300"
-                      >
-                        {/* Cover Image */}
-                        <div className="h-48 bg-surface-container-low overflow-hidden relative">
-                          {post.coverImage ? (
-                            <img 
-                              src={post.coverImage} 
-                              alt={post.title} 
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                            />
-                          ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center text-on-surface-variant/40 group-hover:scale-105 transition-transform duration-500">
-                              <ImageIcon className="size-10 mb-2 opacity-50" />
-                              <span className="font-label-caps text-[10px] uppercase tracking-widest font-bold">No Cover</span>
-                            </div>
-                          )}
-                          {/* Category Badge overlay */}
-                          {post.category && (
-                            <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md text-on-surface font-label-caps text-[9px] uppercase tracking-widest font-black px-2.5 py-1 rounded-md shadow-sm">
-                              {post.category}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Card Content */}
-                        <div className="p-5 flex-1 flex flex-col">
-                          {/* Author Info */}
-                          <Link href={`/profile/${author._id || ''}`} onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 mb-3 group/author w-fit">
-                            {author.avatar ? (
-                              <img src={author.avatar} alt={author.name} className="w-6 h-6 rounded-full object-cover shadow-xs group-hover/author:border-primary border border-transparent transition-colors" />
-                            ) : (
-                              <div className="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] group-hover/author:opacity-80 transition-opacity">
-                                {author.name?.charAt(0)?.toUpperCase() || '?'}
-                              </div>
-                            )}
-                            <span className="text-xs font-semibold text-on-surface-variant truncate group-hover/author:text-primary transition-colors">{author.name || 'Unknown'}</span>
-                          </Link>
-
-                          {/* Title & Excerpt */}
-                          <h2 className="font-headline-md text-[17px] font-bold text-on-surface leading-tight mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                            {post.title}
-                          </h2>
-                          <p className="font-body-md text-sm text-on-surface-variant line-clamp-2 mb-4 flex-1 font-light">
-                            {post.excerpt}
-                          </p>
-
-                          {/* Footer details */}
-                          <div className="flex items-center justify-between text-[11px] font-label-caps font-bold tracking-widest uppercase text-on-surface-variant mt-auto pt-4 border-t border-outline-variant/20">
-                            <span>{formatDate(post.createdAt)}</span>
-                            <div className="flex items-center gap-3">
-                              <span>{readTime} MIN READ</span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (user) toggleBookmark(post._id);
-                                }}
-                                className="p-1 text-primary hover:bg-surface-container rounded-full transition-all duration-200 cursor-pointer bg-transparent border-0 flex items-center justify-center -mr-1"
-                              >
-                                <Bookmark className="size-4" fill="currentColor" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.article>
+                        variant="solid"
+                      />
                     );
                   })}
                 </motion.div>
@@ -244,5 +182,6 @@ export default function BookmarksPage() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

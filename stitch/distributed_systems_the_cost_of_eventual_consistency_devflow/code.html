@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Distributed Systems: The Cost of Eventual Consistency | DevFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Geist:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0c1324;
+            color: #dce1fb;
+            scroll-behavior: smooth;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(25, 31, 49, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(173, 198, 255, 0.1);
+            border-color: rgba(173, 198, 255, 0.2);
+        }
+        .code-container {
+            background: #0f172a;
+            border-left: 2px solid #adc6ff;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c1324;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #23293c;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2e3447;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#adc6ff",
+                      "on-surface-variant": "#c2c6d6",
+                      "tertiary": "#89ceff",
+                      "surface-container-high": "#23293c",
+                      "on-tertiary-fixed": "#001e2f",
+                      "on-secondary": "#1000a9",
+                      "surface-container-highest": "#2e3447",
+                      "on-surface": "#dce1fb",
+                      "tertiary-container": "#009ada",
+                      "secondary": "#c0c1ff",
+                      "primary-fixed-dim": "#adc6ff",
+                      "on-error-container": "#ffdad6",
+                      "on-primary": "#002e6a",
+                      "primary-container": "#4d8eff",
+                      "inverse-surface": "#dce1fb",
+                      "error-container": "#93000a",
+                      "surface-bright": "#33394c",
+                      "primary-fixed": "#d8e2ff",
+                      "on-secondary-fixed": "#07006c",
+                      "background": "#0c1324",
+                      "surface-dim": "#0c1324",
+                      "on-secondary-fixed-variant": "#2f2ebe",
+                      "on-primary-container": "#00285d",
+                      "on-primary-fixed": "#001a42",
+                      "inverse-primary": "#005ac2",
+                      "on-secondary-container": "#b0b2ff",
+                      "surface-variant": "#2e3447",
+                      "secondary-fixed": "#e1e0ff",
+                      "surface-tint": "#adc6ff",
+                      "surface-container": "#191f31",
+                      "on-primary-fixed-variant": "#004395",
+                      "inverse-on-surface": "#2a3043",
+                      "on-tertiary": "#00344d",
+                      "tertiary-fixed": "#c9e6ff",
+                      "surface": "#0c1324",
+                      "outline": "#8c909f",
+                      "secondary-fixed-dim": "#c0c1ff",
+                      "surface-container-lowest": "#070d1f",
+                      "surface-container-low": "#151b2d",
+                      "on-tertiary-fixed-variant": "#004c6e",
+                      "error": "#ffb4ab",
+                      "on-tertiary-container": "#002d43",
+                      "on-error": "#690005",
+                      "secondary-container": "#3131c0",
+                      "on-background": "#dce1fb",
+                      "outline-variant": "#424754",
+                      "tertiary-fixed-dim": "#89ceff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-lg": "32px",
+                      "container-max": "1200px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "stack-md": "16px",
+                      "section-gap": "80px",
+                      "unit": "4px",
+                      "stack-sm": "8px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "code-sm": ["JetBrains Mono"],
+                      "label-caps": ["JetBrains Mono"],
+                      "body-md": ["Geist"],
+                      "body-lg": ["Geist"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "code-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="font-body-md text-body-md">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 shadow-sm z-50">
+<div class="flex justify-between items-center h-16 px-gutter max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary tracking-tight">DevFlow</div>
+<div class="hidden md:flex gap-gutter items-center">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 transition-colors duration-200" href="#">Architecture</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Backend</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Frontend</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">DevOps</a>
+</div>
+<div class="flex gap-stack-md items-center">
+<button class="font-body-md text-body-md text-on-surface-variant hover:text-primary active:scale-95 transition-all">Sign In</button>
+<button class="bg-primary-container text-on-primary-container px-6 py-2 rounded-lg font-semibold active:scale-95 transition-all">Sign Up</button>
+</div>
+</div>
+</nav>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative h-[716px] w-full overflow-hidden flex items-end pb-12">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="A cinematic, high-impact digital visualization of a global data network. Glowing interconnected nodes and fiber optic lines span across a dark, deep blue tech-themed landscape. The lighting is moody with electric blue and soft cyan glows, creating a visionary and architectural mood. The style is premium, clean, and highly technical, perfectly suited for an engineering blog background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxx3FQjm_2cFZOtdwf4y-aZ0YdJtWolqp-BNH7nn8HWREZYezuz7XYW-VpW33AjA9tIwtTk0JMRTB-tO35lNNFtQnVbp6J_P_ltyyxLBVqLnmoRcc7A7AuCQkg_CLFQYx1SSmncVUVRo3_lyGWEZX5zatUOWInOQXTJX-82TpgeeA3-NIibW0CovnGxAOBpUThi7HydlHJjJMnIWFniaHEJq2rBzXYLDRXu8EFCLx9E-Dx8OmIqA4HoG9xqxiFwihKMCs-ymDtQyhb"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+<div class="relative z-10 max-w-container-max mx-auto px-gutter w-full">
+<div class="glass-card p-8 md:p-12 rounded-xl max-w-3xl">
+<span class="inline-block px-3 py-1 mb-6 rounded-full bg-primary/10 text-primary font-label-caps text-label-caps border border-primary/20">Architecture</span>
+<h1 class="font-display-lg text-display-lg md:text-display-lg text-on-surface mb-6 leading-tight">Distributed Systems: The Cost of Eventual Consistency</h1>
+<div class="flex items-center gap-stack-md">
+<img class="w-12 h-12 rounded-full border border-white/10" data-alt="Professional headshot of a senior software architect, Alex Rivera. He has a thoughtful expression, wearing modern glasses, set against a blurred technical studio background. The lighting is soft and professional, emphasizing a high-end, authoritative persona for a tech leader." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDR7k5C6bRLBTDLr2qTWd8Q8RTOO3-FjFH3eoUIdOegCPrpvYv76FK5Hvc6Vstfu1KlZTzMlnZm4k0m6FLlHNPqsCrMc51NSmh2TtjLW8qH_qKA952vXmjuMGhMSUxk5FAjbRIkgVYhaJr9lXDwxbKIDg9tvY7-GGONQMlk_xd7WBoq-LgS_4sLEQ1WEbYF2Ewle4DEOOT31Y43FvBSZGP5D9cailv1DnYfON9S1bEc1YlvueI_de-N7heWkc2Y1-sj8hTPJF4Trd6a"/>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Alex Rivera</p>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Engineering Lead • 12 min read</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Article Layout -->
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 lg:grid-cols-12 gap-gutter py-section-gap relative">
+<!-- Sidebar Left: TOC -->
+<aside class="hidden lg:block lg:col-span-3">
+<div class="sticky top-24 space-y-stack-lg">
+<div>
+<h4 class="font-label-caps text-label-caps text-primary mb-stack-md tracking-widest">ON THIS PAGE</h4>
+<ul class="space-y-stack-sm border-l border-white/5">
+<li><a class="block pl-4 py-1 text-on-surface border-l-2 border-primary -ml-[1px] font-medium" href="#introduction">Introduction</a></li>
+<li><a class="block pl-4 py-1 text-on-surface-variant hover:text-primary transition-colors" href="#cap-theorem">The CAP Theorem</a></li>
+<li><a class="block pl-4 py-1 text-on-surface-variant hover:text-primary transition-colors" href="#conflict-resolution">Conflict Resolution</a></li>
+<li><a class="block pl-4 py-1 text-on-surface-variant hover:text-primary transition-colors" href="#performance-tradeoffs">Performance Tradeoffs</a></li>
+<li><a class="block pl-4 py-1 text-on-surface-variant hover:text-primary transition-colors" href="#implementation">Implementation in Go</a></li>
+</ul>
+</div>
+<div class="pt-stack-lg">
+<h4 class="font-label-caps text-label-caps text-primary mb-stack-md tracking-widest">SHARE</h4>
+<div class="flex gap-stack-md">
+<button class="w-10 h-10 rounded-lg glass-card flex items-center justify-center hover:text-primary transition-all active:scale-95"><span class="material-symbols-outlined">share</span></button>
+<button class="w-10 h-10 rounded-lg glass-card flex items-center justify-center hover:text-primary transition-all active:scale-95"><span class="material-symbols-outlined">link</span></button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<article class="lg:col-span-6 space-y-stack-lg">
+<div class="prose prose-invert max-w-none" id="introduction">
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed first-letter:text-5xl first-letter:font-bold first-letter:text-primary first-letter:mr-3 first-letter:float-left">
+                        In the landscape of modern distributed systems, the promise of infinite scalability often comes at the price of strict consistency. As we push our architectures to span global regions, the latency of a synchronized state becomes a bottleneck that can no longer be ignored. This is where eventual consistency enters the frame—not as a failure of design, but as a deliberate architectural choice.
+                    </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-6">
+                        However, the "cost" of eventual consistency isn't just measured in milliseconds of delay; it's measured in complexity, developer cognitive load, and the potential for user-facing anomalies.
+                    </p>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface pt-8" id="cap-theorem">The CAP Theorem Revisited</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                    While the CAP theorem is often cited in university lectures, its practical application in high-throughput environments like financial ledgering or real-time social feeds requires a nuanced understanding of Partition Tolerance.
+                </p>
+<!-- Technical Diagram Placeholder -->
+<div class="my-10 p-1 glass-card rounded-xl overflow-hidden group">
+<div class="relative aspect-video bg-surface-container-high rounded-lg flex items-center justify-center overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" data-alt="An abstract technical diagram representing distributed nodes in a network grid. Glowing blue lines connect geometric blocks that represent database shards. The visualization uses a high-end blueprint aesthetic with translucent layers, fine 1px lines, and a professional dark mode palette with cyan and cobalt blue accents. The mood is precise, analytical, and futuristic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKBbdbcyHScIs6EoyPVvCwpCJt2B0ubNIGZPBd1Itb5bmX9RhMuRMwPmtFWoi0okGw2rwtjgm0pBsW-tnzdnTzstUpvX3R8F3Iw4EC_23GF9MnYOPjRgVK1LGnla0c4GBafLGRwMiW2V8aWYgEuem7pecM7gSrfpKpH3ylV5_eA047xMe_aD2JkBGVXB4vs-3iFc0RBcQ5-vhbcfId_bJpUx5pLKcpm3ekJ3vhIFvIcvvgAnoAzMcTv5N5rEEwkdN2lbrEl-LPsVaU"/>
+<div class="relative z-10 text-center p-6">
+<span class="material-symbols-outlined text-primary text-5xl mb-4">account_tree</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Visualizing Data Propagation</h3>
+<p class="text-on-surface-variant mt-2 font-body-md">Typical replication lag across 3 global regions (US-East, EU-West, AP-South)</p>
+</div>
+</div>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface pt-8" id="implementation">Implementation in Go</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-6">
+                    A common pattern for handling concurrent updates in an eventually consistent environment is the use of Conflict-free Replicated Data Types (CRDTs). Here is a simplified implementation of a G-Counter in Go.
+                </p>
+<!-- Code Block -->
+<div class="code-container rounded-xl overflow-hidden my-8 shadow-2xl">
+<div class="flex justify-between items-center px-4 py-2 bg-white/5 border-b border-white/5">
+<span class="font-label-caps text-label-caps text-on-surface-variant">main.go</span>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+<span class="font-label-caps text-label-caps">Copy</span>
+</button>
+</div>
+<pre class="p-6 overflow-x-auto font-code-sm text-code-sm leading-relaxed text-secondary"><span class="text-primary-container">type</span> GCounter <span class="text-primary-container">struct</span> {
+    nodes <span class="text-primary-container">map</span>[<span class="text-primary-container">string</span>]<span class="text-primary-container">int</span>
+    mu    sync.RWMutex
+}
+
+<span class="text-on-tertiary-container">// Inc increments the counter for a specific node</span>
+<span class="text-primary-container">func</span> (c *GCounter) Inc(nodeID <span class="text-primary-container">string</span>) {
+    c.mu.Lock()
+    <span class="text-primary-container">defer</span> c.mu.Unlock()
+    c.nodes[nodeID]++
+}
+
+<span class="text-on-tertiary-container">// Merge combines two counters (Idempotent)</span>
+<span class="text-primary-container">func</span> (c *GCounter) Merge(other *GCounter) {
+    c.mu.Lock()
+    <span class="text-primary-container">defer</span> c.mu.Unlock()
+    <span class="text-primary-container">for</span> k, v := <span class="text-primary-container">range</span> other.nodes {
+        <span class="text-primary-container">if</span> v &gt; c.nodes[k] {
+            c.nodes[k] = v
+        }
+    }
+}</pre>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                    The beauty of the G-Counter lies in its idempotency. No matter how many times or in what order the merge occurs, the state will eventually converge across all nodes.
+                </p>
+<!-- Floating CTA -->
+<div class="flex flex-col md:flex-row items-center justify-between p-8 glass-card rounded-2xl mt-12 gap-stack-md">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Ready to dive deeper?</h4>
+<p class="text-on-surface-variant">Get the full whitepaper on Distributed Consistency Patterns.</p>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-lg font-bold flex items-center gap-2 glow-hover transition-all active:scale-95 whitespace-nowrap">
+<span class="material-symbols-outlined">download</span>
+                        Download PDF Copy
+                    </button>
+</div>
+</article>
+<!-- Sidebar Right: Related/Engagement -->
+<aside class="hidden lg:block lg:col-span-3">
+<div class="sticky top-24 space-y-stack-lg">
+<div>
+<h4 class="font-label-caps text-label-caps text-primary mb-stack-md tracking-widest">TOP VOICES</h4>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="Avatar of Sarah Chen, a distributed database researcher with a neutral background and professional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN5807B0gVuZt_19LjIRPo23xER5bhzNerjEkQHCOGLhlXO9HAwOdeHTN5g5wRtY23ABMjAsKr8WsKBe49Gwwo37SZCiUhjsho5XoQqJ1knhuzqEB_mY4xRX5DwlgttWXWqIHkkKjzWJQmDzYGo7MbaA8qxRXE41fdNWoo4aVQN2tB_gd4L9YNPrHptjncrfnRMynNvWq3R19ylheMEJxC3-j7G3JAsVjOF-OKTFMSljzSPkY85kdo1k6laZk3Spt73xPRFtqQNyM7"/>
+<span class="text-on-surface text-sm font-medium">Sarah Chen</span>
+</div>
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="Avatar of Marcus Thorne, a senior DevOps engineer, featuring high-contrast studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe9_n4nhuD8CUZB6UosKXtUIl3u2ljbwBGhM_cmI_bgb6TxdC4EfBMvOKqLQSEGH5DogdZLYsbLXM2AOm9KtrLZ_MyGpk5usTA38pyA48ep4PC0TvHjOLv_bFvL9OrdY_HmYLVAUeRTX4hlhGddbz-3v8xSEmWu35F-0DwhDrY3Agd-fBC7DVqHWWRyqh3YqOptAzh642_bdks-LAav9U6JrKHyk7uyAIZmrXlGsFrhc9cvue9MvkpAywKiB8-WgQk6cVRu8DBdBW2"/>
+<span class="text-on-surface text-sm font-medium">Marcus Thorne</span>
+</div>
+</div>
+</div>
+<div class="pt-stack-lg border-t border-white/5">
+<h4 class="font-label-caps text-label-caps text-primary mb-stack-md tracking-widest">SPONSORED</h4>
+<div class="glass-card p-4 rounded-xl">
+<p class="text-xs text-on-surface-variant mb-2">High-performance hosting for architects.</p>
+<img class="w-full h-32 object-cover rounded-lg mb-3" data-alt="A macro shot of high-end circuit boards and processor units with glowing amber and blue lighting. The style is technical and abstract, suggesting immense computational power and high-end infrastructure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAldw3onx8LrRurGlI8y1l9x7ewzS241BmUWi6-Cn5GGltifrO7UqhunHTGoHAB-h61jik-4dZqbtLFwKBtBVtnvqUKjAOO9xlEDl5o24BmjRQxgepXeninNANT5ti72mAjGdBvhzeG5-rIz1TFQXorVV5wMo_XIIgtEiRshMog3BVg0AzvsxTKr4GEGpttHH-sbI-ru38UMJ9LRgYEHYAULLe-C2SO18MyFS4adxw5e5ngOvv3V2ixSIq0__TXXmDSWRjV65MrKjkf"/>
+<a class="text-primary text-sm font-semibold flex items-center gap-1" href="#">Learn More <span class="material-symbols-outlined text-xs">open_in_new</span></a>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- Related Articles Section -->
+<section class="bg-surface-container-low py-section-gap">
+<div class="max-w-container-max mx-auto px-gutter">
+<h3 class="font-headline-lg text-headline-lg text-on-surface mb-stack-lg">Related Articles</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Related Card 1 -->
+<div class="glass-card rounded-xl overflow-hidden group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Cybersecurity theme with glowing green binary codes on a dark futuristic screen. The mood is high-tech and secure, with a professional dark mode aesthetic. " src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDD5mZUUcQOeWmFeBBsKH4EiXKik600aPFOVwadTnwtedO3oTIaA3didVSUD_xWFzGHghTL9lqiSX0tohy75wTeDUBZo7cAFDWgeXPj5ZjsOiFgG2r0LUES_IkNgg-wz3oCXzepcJgoPYRybbryC4caJIw7Q6papSjueCYX3gEfQpwvwf9t92hBv1PqZ-rHlAfDjzFT6FCqnV2EM3pa1ggjqnQJgSAoQ3BimlEfMc72kM-gG7XWXUFLRUTzZ5hc-KVLCudBlz839yf"/>
+</div>
+<div class="p-6">
+<span class="text-primary font-label-caps text-label-caps">Security</span>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-2 mb-4 group-hover:text-primary transition-colors">Hardening Kubernetes: A Pragmatic Guide</h4>
+<p class="text-on-surface-variant text-sm line-clamp-2">Securing clusters requires more than just RBAC. We dive into network policies and OPA.</p>
+</div>
+</div>
+<!-- Related Card 2 -->
+<div class="glass-card rounded-xl overflow-hidden group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Abstract fluid simulation representing data pipelines, with vibrant blue and purple flowing elements against a dark background. High-end, visionary engineering aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQFYWAMTCbCejPOsr4yJqyX_uWT1hHOplLufJjNjIx6QaGNrW6wQs-2jdWmfy8zhGx1ajXaWlO1GMT8fLx4SqRx48wiQRGs04XXvqX-V5qHnEA7fvG9HuhOXpBy-U0NL6icTnSkS7Z-iPHEEuyjC9q06BG_LAncQjpwBYFk6zilxB3cQLGFLzs7tD_T7axRCwsErFJiDMY9Pu-qi_BevAdBiu8810cHpc-j8CfUZ6jfCpULIlbnTobLszwm1mNgTh-ApVXE-dsHzjF"/>
+</div>
+<div class="p-6">
+<span class="text-primary font-label-caps text-label-caps">DevOps</span>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-2 mb-4 group-hover:text-primary transition-colors">Observability vs. Monitoring: The 2024 Shift</h4>
+<p class="text-on-surface-variant text-sm line-clamp-2">Why logs and metrics are no longer enough for complex microservices architectures.</p>
+</div>
+</div>
+<!-- Related Card 3 -->
+<div class="glass-card rounded-xl overflow-hidden group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Clean desk setup with a laptop showing complex lines of code, a mechanical keyboard, and soft ambient lighting. The style is productive, professional, and elegant dark mode." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm4m2uVXfNInMqIWkVHFiqYBrCzR1fJ5YrDi1eBSWe9uQSBI1RZWQlcQ3eDXbUBYPoO1AQYcMc9RAAUmZltXCvSweBmIh1N1S4_VvC9A3G_irxG9wBUsbvi6jOnxBZ6ksAm0vCGl0gvrIvPJzVti913dnfe8LUrxw77PfBjKIKfRgO2sifn1M2qL2kcqK7s0sNkT_-b0U3ng82e76Kj6_iEiEdHivG_Uo_GaKMEF0U5cvIb3BLosf9Ngpz9BiyrX73eczAj7R7t53h"/>
+</div>
+<div class="p-6">
+<span class="text-primary font-label-caps text-label-caps">Backend</span>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-2 mb-4 group-hover:text-primary transition-colors">Rust for the Skeptical Engineer</h4>
+<p class="text-on-surface-variant text-sm line-clamp-2">Is the learning curve worth the safety? An honest review of production Rust.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-white/5 py-section-gap">
+<div class="grid grid-cols-1 md:grid-cols-4 px-gutter max-w-container-max mx-auto gap-gutter">
+<div class="md:col-span-1">
+<div class="font-headline-md text-headline-md text-primary font-bold mb-4">DevFlow</div>
+<p class="text-on-surface-variant text-sm">© 2024 DevFlow. Engineered for precision.</p>
+</div>
+<div>
+<h5 class="font-label-caps text-label-caps text-on-surface mb-6">RESOURCES</h5>
+<ul class="space-y-3">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Documentation</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">API Reference</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Changelog</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-caps text-label-caps text-on-surface mb-6">COMMUNITY</h5>
+<ul class="space-y-3">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Newsletter</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Status</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-caps text-label-caps text-on-surface mb-6">CONNECT</h5>
+<div class="flex gap-4">
+<button class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:text-primary transition-all"><span class="material-symbols-outlined">alternate_email</span></button>
+<button class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:text-primary transition-all"><span class="material-symbols-outlined">public</span></button>
+</div>
+</div>
+</div>
+</footer>
+<!-- Mobile Scroll Interaction -->
+<script>
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg');
+            } else {
+                nav.classList.remove('shadow-lg');
+            }
+        });
+
+        // Simple TOC active state logic
+        const sections = document.querySelectorAll('h2, #introduction');
+        const tocLinks = document.querySelectorAll('aside nav ul li a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 120) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('text-on-surface', 'border-primary', 'font-medium');
+                link.classList.add('text-on-surface-variant');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('text-on-surface', 'border-primary', 'font-medium');
+                    link.classList.remove('text-on-surface-variant');
+                }
+            });
+        });
+    </script>
+</body></html>

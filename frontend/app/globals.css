@@ -65,14 +65,15 @@
   --spacing-gutter: 24px;
   --spacing-content-max: 720px;
 
-  --font-display-xl: var(--font-serif);
-  --font-body-md: var(--font-sans);
-  --font-label-caps: var(--font-sans);
-  --font-headline-lg-mobile: var(--font-serif);
-  --font-headline-lg: var(--font-serif);
-  --font-code-sm: var(--font-mono);
-  --font-headline-md: var(--font-serif);
-  --font-body-lg: var(--font-sans);
+  /* Stitch Font System: Hanken Grotesk headlines, Geist body, JetBrains Mono code/labels */
+  --font-display-xl: var(--font-sans);     /* Hanken Grotesk */
+  --font-headline-lg: var(--font-sans);    /* Hanken Grotesk */
+  --font-headline-lg-mobile: var(--font-sans);
+  --font-headline-md: var(--font-sans);    /* Hanken Grotesk */
+  --font-body-lg: var(--font-body);        /* Geist */
+  --font-body-md: var(--font-body);        /* Geist */
+  --font-label-caps: var(--font-mono);     /* JetBrains Mono */
+  --font-code-sm: var(--font-mono);        /* JetBrains Mono */
 
   /* Map standard Shadcn variables to Writen Theme */
   --color-foreground: var(--color-on-background);
@@ -88,138 +89,115 @@
   --color-destructive: var(--color-error);
 }
 
+/* ── Default Light Theme ───────────────────────────── */
 :root {
-  --background: #fbfaf8; /* Premium warm cream/alabaster background */
-  --foreground: #1c1917; /* Stone-900 */
-  --on-background: #1c1917;
+  --background: #ffffff;
+  --foreground: #0c1324;
+  --on-background: #0c1324;
 
-  --primary: #4f46e5;    /* Elegant Indigo accent */
+  --primary: #2563eb;
   --on-primary: #ffffff;
-  --primary-container: #e0e7ff; /* Soft Indigo */
-  --on-primary-container: #312e81;
+  --primary-container: #dbeafe;
+  --on-primary-container: #1e3a8a;
 
-  --secondary: #78716c;  /* Stone-500 */
+  --secondary: #64748b;
   --on-secondary: #ffffff;
-  --secondary-container: #f5f5f4;
-  --on-secondary-container: #1c1917;
+  --secondary-container: #f1f5f9;
+  --on-secondary-container: #334155;
+  --secondary-fixed: #e2e8f0;
+  --secondary-fixed-dim: #cbd5e1;
+  --on-secondary-fixed: #0f172a;
+  --on-secondary-fixed-variant: #334155;
 
-  --tertiary: #5c6370;
-  --tertiary-container: #f0f1f3;
+  --tertiary: #0ea5e9;
+  --tertiary-container: #e0f2fe;
   --on-tertiary: #ffffff;
-  --on-tertiary-container: #1a1c20;
+  --on-tertiary-container: #0c4a6e;
+  --tertiary-fixed: #bae6fd;
+  --tertiary-fixed-dim: #7dd3fc;
+  --on-tertiary-fixed: #082f49;
+  --on-tertiary-fixed-variant: #0369a1;
 
-  --surface: #ffffff;    /* Pure White for cards/panels */
-  --on-surface: #1c1917;
-  --on-surface-variant: #57534e; /* Stone-600 */
-  --surface-variant: #f5f5f4;
-  --surface-dim: #faf9f6;
+  --surface: #ffffff;
+  --on-surface: #0c1324;
+  --on-surface-variant: #475569;
+  --surface-variant: #f8fafc;
+  --surface-dim: #f1f5f9;
   --surface-bright: #ffffff;
 
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #f5f3ef;    /* Light cream section */
-  --surface-container: #eae6df;        /* Medium cream section */
-  --surface-container-high: #dfdad0;
-  --surface-container-highest: #d1c9bc;
+  --surface-container-low: #f8fafc;
+  --surface-container: #f1f5f9;
+  --surface-container-high: #e2e8f0;
+  --surface-container-highest: #cbd5e1;
 
-  --outline: #a8a29e;      /* Stone-400 */
-  --outline-variant: #e7e5e4; /* Stone-200 */
+  --outline: #cbd5e1;
+  --outline-variant: #e2e8f0;
 
   --error: #ef4444;
   --on-error: #ffffff;
   --error-container: #fee2e2;
-  --on-error-container: #991b1b;
+  --on-error-container: #b91c1c;
 
-  --inverse-surface: #1c1917;
-  --inverse-on-surface: #f5f5f4;
-  --inverse-primary: #818cf8;
+  --inverse-surface: #0f172a;
+  --inverse-on-surface: #f8fafc;
+  --inverse-primary: #60a5fa;
 
-  --surface-tint: #4f46e5;
+  --surface-tint: #2563eb;
 
-  --primary-fixed: #4f46e5;
-  --primary-fixed-dim: #6366f1;
-  --on-primary-fixed: #ffffff;
-  --on-primary-fixed-variant: #e0e7ff;
+  --primary-fixed: #bfdbfe;
+  --primary-fixed-dim: #93c5fd;
+  --on-primary-fixed: #1e3a8a;
+  --on-primary-fixed-variant: #1d4ed8;
 
-  --secondary-fixed: #78716c;
-  --secondary-fixed-dim: #a8a29e;
-  --on-secondary-fixed: #ffffff;
-  --on-secondary-fixed-variant: #f5f5f4;
-
-  --tertiary-fixed: #5c6370;
-  --tertiary-fixed-dim: #8a93a3;
-  --on-tertiary-fixed: #ffffff;
-  --on-tertiary-fixed-variant: #f0f1f3;
-
-  /* Glassmorphism support */
-  --background-glass: rgba(255, 255, 255, 0.72);
-  --border-glass: rgba(228, 228, 231, 0.6);
+  --background-glass: rgba(255, 255, 255, 0.7);
+  --border-glass: rgba(0, 0, 0, 0.05);
 }
 
+/* ── Stitch Design System: DevFlow Dark Theme ───────────────────────────── */
 .dark {
-  --background: #09090b; /* Zinc-950 midnight dark */
-  --foreground: #f4f4f5; /* Zinc-100 */
-  --on-background: #f4f4f5;
-
-  --primary: #818cf8;    /* Bright Indigo/violet */
-  --on-primary: #09090b;
-  --primary-container: #1e1b4b; /* Deep indigo */
-  --on-primary-container: #e0e7ff;
-
-  --secondary: #a1a1aa;  /* Zinc-400 */
-  --on-secondary: #09090b;
-  --secondary-container: #27272a;
-  --on-secondary-container: #f4f4f5;
-
-  --tertiary: #a1a1aa;
-  --tertiary-container: #27272a;
-  --on-tertiary: #09090b;
-  --on-tertiary-container: #f4f4f5;
-
-  --surface: #121214;    /* Sleek Zinc/slate dark cards */
-  --on-surface: #f4f4f5;
-  --on-surface-variant: #a1a1aa; /* Zinc-400 */
-  --surface-variant: #27272a;
-  --surface-dim: #0e0e11;
-  --surface-bright: #1c1c1f;
-
-  --surface-container-lowest: #0a0a0c;
-  --surface-container-low: #18181b;    /* Zinc-900 container */
-  --surface-container: #1e1e24;
-  --surface-container-high: #27272a;
-  --surface-container-highest: #3f3f46;
-
-  --outline: #52525b;      /* Zinc-600 */
-  --outline-variant: #27272a; /* Zinc-800 */
-
-  --error: #f87171;
-  --on-error: #09090b;
-  --error-container: #450a0a;
-  --on-error-container: #fca5a5;
-
-  --inverse-surface: #f4f4f5;
-  --inverse-on-surface: #09090b;
-  --inverse-primary: #4f46e5;
-
-  --surface-tint: #6366f1;
-
-  --primary-fixed: #6366f1;
-  --primary-fixed-dim: #4f46e5;
-  --on-primary-fixed: #09090b;
-  --on-primary-fixed-variant: #1e1b4b;
-
-  --secondary-fixed: #a1a1aa;
-  --secondary-fixed-dim: #71717a;
-  --on-secondary-fixed: #09090b;
-  --on-secondary-fixed-variant: #27272a;
-
-  --tertiary-fixed: #a1a1aa;
-  --tertiary-fixed-dim: #71717a;
-  --on-tertiary-fixed: #09090b;
-  --on-tertiary-fixed-variant: #27272a;
-
-  /* Glassmorphism support */
-  --background-glass: rgba(18, 18, 20, 0.72);
-  --border-glass: rgba(39, 39, 42, 0.4);
+  --background: #0c1324;
+  --foreground: #dce1fb;
+  --on-background: #dce1fb;
+  --primary: #adc6ff;
+  --on-primary: #002e6a;
+  --primary-container: #4d8eff;
+  --on-primary-container: #00285d;
+  --secondary: #c0c1ff;
+  --on-secondary: #1000a9;
+  --secondary-container: #3131c0;
+  --on-secondary-container: #b0b2ff;
+  --tertiary: #89ceff;
+  --tertiary-container: #009ada;
+  --on-tertiary: #00344d;
+  --on-tertiary-container: #002d43;
+  --surface: #0c1324;
+  --on-surface: #dce1fb;
+  --on-surface-variant: #c2c6d6;
+  --surface-variant: #2e3447;
+  --surface-dim: #0c1324;
+  --surface-bright: #33394c;
+  --surface-container-lowest: #070d1f;
+  --surface-container-low: #151b2d;
+  --surface-container: #191f31;
+  --surface-container-high: #23293c;
+  --surface-container-highest: #2e3447;
+  --outline: #8c909f;
+  --outline-variant: #424754;
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+  --inverse-surface: #dce1fb;
+  --inverse-on-surface: #2a3043;
+  --inverse-primary: #005ac2;
+  --surface-tint: #adc6ff;
+  --primary-fixed: #d8e2ff;
+  --primary-fixed-dim: #adc6ff;
+  --on-primary-fixed: #001a42;
+  --on-primary-fixed-variant: #004395;
+  --background-glass: rgba(25, 31, 49, 0.6);
+  --border-glass: rgba(255, 255, 255, 0.05);
 }
 
 @layer base {
@@ -261,17 +239,32 @@
   50% { transform: scale(1.05); opacity: 0.08; }
 }
 
-/* Custom utility classes from HTML */
+/* Custom utility classes — Stitch Design System */
 @layer utilities {
+  /* Stitch glass card — matches rgba(25,31,49,0.6) with blur */
+  .glass-card {
+    background: rgba(25, 31, 49, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  .glass-card:hover {
+    border-color: rgba(173, 198, 255, 0.3);
+    box-shadow: 0 0 20px rgba(173, 198, 255, 0.1);
+  }
+  .glow-hover:hover {
+    box-shadow: 0 0 20px rgba(173, 198, 255, 0.1);
+  }
   .editorial-shadow {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 8px 24px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.04);
   }
   .card-hover-shadow {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2), 0 1px 4px rgba(0,0,0,0.15);
   }
   .input-focus-ring:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 0 2px rgba(173, 198, 255, 0.15);
     outline: none;
   }
   .glassmorphism {
@@ -280,11 +273,6 @@
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-glass);
   }
-  .premium-gradient-bg {
-    background: radial-gradient(at 0% 0%, rgba(24, 24, 27, 0.015) 0, transparent 50%),
-                radial-gradient(at 50% 0%, rgba(39, 39, 42, 0.025) 0, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(24, 24, 27, 0.015) 0, transparent 50%);
-  }
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -292,12 +280,23 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  /* Subtle primary glow for active elements */
+  /* Primary glow — stitch accent color #adc6ff */
   .primary-glow {
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12), 0 1px 4px rgba(79, 70, 229, 0.2);
+    box-shadow: 0 0 0 3px rgba(173, 198, 255, 0.15), 0 1px 4px rgba(173, 198, 255, 0.25);
   }
-  .dark .primary-glow {
-    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15), 0 1px 4px rgba(129, 140, 248, 0.25);
+  /* Stitch radial glow accent background */
+  .glow-accent {
+    background: radial-gradient(circle at center, rgba(173, 198, 255, 0.15) 0%, transparent 70%);
+  }
+  /* Stitch skeleton shimmer */
+  .skeleton {
+    background: linear-gradient(90deg, #191f31 25%, #2e3447 50%, #191f31 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+  }
+  @keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 }
 

@@ -4,11 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Eye, Bookmark, Share2, Clock, Calendar, Type, ChevronRight, Loader2, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import TopNavBar from '@/components/layout/TopNavBar';
 import SideNavBar from '@/components/layout/SideNavBar';
 import { DetailsPageSkeleton } from '@/components/ui/skeleton';
+import { TableOfContents } from '@/components/article/TableOfContents';
+import { InteractionDock } from '@/components/article/InteractionDock';
+import { RelatedStories } from '@/components/article/RelatedStories';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
@@ -68,6 +71,8 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const hasIncrementedView = useRef(false);
+
   // Fetch / Sync view updates & latest details on mount
   useEffect(() => {
     const fetchLatestDetails = async () => {
@@ -80,7 +85,15 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
         if (accessToken) {
           headers['Authorization'] = `Bearer ${accessToken}`;
         }
-        const res = await fetch(`${API}/posts/${slug}`, { headers });
+        
+        // Only increment the view on the very first client-side fetch per session
+        const shouldIncrement = !hasIncrementedView.current;
+        if (shouldIncrement) {
+          hasIncrementedView.current = true; // Mark immediately to prevent race conditions during concurrent refetches
+        }
+        const incrementParam = shouldIncrement ? '?incrementView=true' : '';
+        const res = await fetch(`${API}/posts/${slug}${incrementParam}`, { headers });
+        
         const data = await res.json();
         if (res.ok && data.success && data.data) {
           setPost(data.data);
@@ -446,193 +459,28 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                       <div dangerouslySetInnerHTML={{ __html: getProcessedHtml(post.htmlContent) }} />
                     </div>
 
-                    {/* Premium Floating Interaction Dock */}
-                    <motion.div 
-                      initial={{ opacity: 0, y: 50 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-surface/85 backdrop-blur-md border border-outline-variant/50 rounded-full px-6 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex items-center gap-6 z-40 transition-all hover:border-outline duration-300"
-                    >
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant select-none">
-                        <Eye className="size-4 text-secondary" />
-                        <span>{post.views || 0} views</span>
-                      </div>
-                      
-                      <div className="w-px h-4 bg-outline-variant/40" />
-                      
-                      <button 
-                        onClick={() => {
-                          if (user) toggleBookmark(post._id);
-                          else router.push('/login');
-                        }}
-                        className="flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-transparent border-0 outline-none"
-                      >
-                        <Bookmark className="size-4" fill={user?.bookmarks?.includes(post._id) ? "currentColor" : "none"} />
-                        <span>{user?.bookmarks?.includes(post._id) ? 'Saved' : 'Save'}</span>
-                      </button>
-                      
-                      <div className="w-px h-4 bg-outline-variant/40" />
-                      
-                      <button 
-                        onClick={handleShare}
-                        className="flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-transparent border-0 outline-none"
-                      >
-                        <Share2 className="size-4" />
-                        <span>Share</span>
-                      </button>
-                      
-                      <div className="w-px h-4 bg-outline-variant/40" />
-                      
-                      <button 
-                        onClick={handleDownloadPDF}
-                        disabled={pdfDownloading}
-                        className="flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary disabled:opacity-60 transition-colors cursor-pointer bg-transparent border-0 outline-none"
-                        title="Export Article to PDF"
-                      >
-                        {pdfDownloading ? (
-                          <Loader2 className="size-4 animate-spin text-primary" />
-                        ) : (
-                          <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                        )}
-                        <span>{pdfDownloading ? 'Exporting...' : 'PDF'}</span>
-                      </button>
-                    </motion.div>
+                    <InteractionDock 
+                      post={post} 
+                      pdfDownloading={pdfDownloading} 
+                      onDownloadPDF={handleDownloadPDF} 
+                    />
 
                   </motion.article>
 
                   {/* Related Narratives Section */}
-                  <div className="related-stories-section border-t border-outline-variant/40 pt-16 pb-24">
-                    <h3 className="font-headline-md text-xl md:text-2xl font-black uppercase tracking-tight text-on-surface mb-8">
-                      Related Stories
-                    </h3>
-
-                    {relatedLoading ? (
-                      <div className="flex items-center gap-3 text-secondary/60 py-6">
-                        <Loader2 className="size-5 animate-spin text-primary" />
-                        <span className="text-sm font-semibold font-label-caps uppercase tracking-wider">Retrieving relevant narratives...</span>
-                      </div>
-                    ) : relatedPosts.length === 0 ? (
-                      <p className="text-sm text-on-surface-variant leading-relaxed">No related articles found under this topic.</p>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {relatedPosts.map((rPost, index) => (
-                          <motion.div
-                            key={rPost._id}
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1, duration: 0.5 }}
-                            onClick={() => router.push(`/feed/${rPost.slug}`)}
-                            className="group flex flex-col justify-between bg-surface-container-lowest/30 hover:bg-surface-container-lowest border border-outline-variant/30 hover:border-outline-variant/80 rounded-xl p-4 cursor-pointer transition-all duration-300 editorial-shadow hover:-translate-y-0.5"
-                          >
-                            <div className="space-y-3">
-                              {/* Image preview */}
-                              {rPost.coverImage ? (
-                                <div className="w-full aspect-[16/10] overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-container-low shrink-0 relative">
-                                  <img
-                                    src={rPost.coverImage}
-                                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                                    alt={rPost.title}
-                                  />
-                                </div>
-                              ) : (
-                                <div className="w-full aspect-[16/10] rounded-lg border border-dashed border-outline-variant bg-surface-container-low/20 shrink-0 flex items-center justify-center text-secondary/40 select-none">
-                                  <span className="material-symbols-outlined text-3xl">image</span>
-                                </div>
-                              )}
-
-                              <div className="space-y-2">
-                                {rPost.category && (
-                                  <span className="inline-block px-2.5 py-0.5 bg-surface-container text-on-surface-variant rounded-full text-[9px] font-bold uppercase tracking-wider font-label-caps border border-outline-variant/20">
-                                    {rPost.category}
-                                  </span>
-                                )}
-                                <h4 className="font-headline-md text-sm font-bold text-on-surface group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug">
-                                  {rPost.title}
-                                </h4>
-                                <p className="text-on-surface-variant font-light text-xs line-clamp-2 leading-relaxed">
-                                  {rPost.excerpt || 'No description provided.'}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Author metadata */}
-                            <div className="flex items-center gap-2.5 pt-4 mt-4 border-t border-outline-variant/20">
-                              {rPost.authorId?.avatar ? (
-                                <img src={rPost.authorId.avatar} className="w-5.5 h-5.5 rounded-full object-cover border border-outline-variant/30" alt={rPost.authorId.name} />
-                              ) : (
-                                <div className="w-5.5 h-5.5 rounded-full bg-primary/5 text-primary flex items-center justify-center font-bold text-xs border border-primary/10">
-                                  {getAvatarFallback(rPost.authorId?.name || '')}
-                                </div>
-                              )}
-                              <div className="min-w-0">
-                                <span className="block font-body-md text-[11px] font-bold text-on-surface truncate leading-none">{rPost.authorId?.name || 'Anonymous'}</span>
-                                <span className="block text-[9.5px] text-on-surface-variant font-medium mt-0.5 leading-none">
-                                  {calculateReadingTime(rPost.htmlContent)} min read
-                                </span>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <RelatedStories 
+                    relatedLoading={relatedLoading} 
+                    relatedPosts={relatedPosts} 
+                    calculateReadingTime={calculateReadingTime} 
+                  />
                 </div>
 
                 {/* Right Column: Sticky Table of Contents Sidebar */}
-                {headings.length > 0 && (
-                  <aside className="hidden lg:block w-[240px] xl:w-[280px] shrink-0">
-                    <div className="sticky top-24 space-y-6 bg-surface-container-lowest/30 border border-outline-variant/40 rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.01)] backdrop-blur-xs">
-                      <h4 className="font-label-caps text-xs text-on-surface font-bold uppercase tracking-widest pb-3 border-b border-outline-variant/30">
-                        Table of Contents
-                      </h4>
-                      <ul className="space-y-3.5 text-xs max-h-[calc(100vh-280px)] overflow-y-auto no-scrollbar scroll-smooth pr-1">
-                        {headings.map((heading) => {
-                          const isH3 = heading.level === 'h3';
-                          const isActive = activeHeadingId === heading.id;
-                          return (
-                            <li 
-                              key={heading.id} 
-                              className={`${isH3 ? 'pl-4' : ''} transition-all duration-200`}
-                            >
-                              <a
-                                href={`#${heading.id}`}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  document.getElementById(heading.id)?.scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'start',
-                                  });
-                                }}
-                                className={`group flex items-start gap-1.5 py-0.5 leading-normal transition-all duration-200 hover:text-primary ${
-                                  isActive 
-                                    ? 'text-primary font-bold' 
-                                    : 'text-on-surface-variant font-medium'
-                                }`}
-                              >
-                                <ChevronRight 
-                                  className={`size-3.5 mt-0.5 shrink-0 transition-all duration-200 ${
-                                    isActive 
-                                      ? 'opacity-100 translate-x-0 text-primary' 
-                                      : 'opacity-0 -translate-x-1 text-on-surface-variant group-hover:opacity-60 group-hover:translate-x-0'
-                                  }`} 
-                                />
-                                <span className="truncate">{heading.text}</span>
-                              </a>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      
-                      {/* Sticky Footer Info */}
-                      <div className="border-t border-outline-variant/30 pt-4 flex items-center justify-between text-[10px] text-on-surface-variant font-medium select-none">
-                        <span className="flex items-center gap-1"><Clock className="size-3" /> {calculateReadingTime(post.htmlContent)} min read</span>
-                        <span>{headings.length} sections</span>
-                      </div>
-                    </div>
-                  </aside>
-                )}
+                <TableOfContents 
+                  headings={headings} 
+                  activeHeadingId={activeHeadingId} 
+                  readingTime={calculateReadingTime(post.htmlContent)} 
+                />
               </>
             ) : null}
           </div>

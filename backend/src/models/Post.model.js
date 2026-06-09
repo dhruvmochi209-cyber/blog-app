@@ -9,18 +9,36 @@ import mongoose from 'mongoose';
 export const PREDEFINED_CATEGORIES = [
   'JavaScript',
   'TypeScript',
+  'Python',
+  'Rust',
+  'Go',
+  'Java',
+  'C++',
   'React',
   'Next.js',
+  'Vue',
+  'Angular',
   'Node.js',
-  'Python',
   'System Design',
   'DevOps',
-  'Databases',
   'Cloud & AWS',
+  'Docker & Kubernetes',
+  'Databases',
+  'PostgreSQL',
+  'MongoDB',
   'Security',
   'Algorithms & DSA',
+  'AI & Machine Learning',
+  'Data Science',
+  'Web3 & Crypto',
+  'Mobile Development',
+  'Engineering',
+  'Design',
+  'Product',
   'Career & Growth',
+  'Startups',
   'Open Source',
+  'Culture',
   'Other',
 ];
 
@@ -99,6 +117,11 @@ const postSchema = new mongoose.Schema(
       index: true,
     },
 
+    viewedBy: [{
+      type: String, // Stores IP address or User ID to prevent duplicate views
+      select: false,
+    }],
+
     authorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -111,6 +134,7 @@ const postSchema = new mongoose.Schema(
     toJSON: {
       transform: (_doc, ret) => {
         delete ret.__v;
+        delete ret.viewedBy; // Do not expose IPs or User IDs to the client
         return ret;
       },
     },

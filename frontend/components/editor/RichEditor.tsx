@@ -9,36 +9,40 @@ import Image from '@tiptap/extension-image';
 import CodeBlock from '@tiptap/extension-code-block';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 
+import { useMemo } from 'react';
+
 interface RichEditorProps {
   content: string;
   onChange: (html: string) => void;
 }
 
 export default function RichEditor({ content, onChange }: RichEditorProps) {
+  const extensions = useMemo(() => [
+    StarterKit.configure({
+      codeBlock: false,
+      horizontalRule: false,
+    }),
+    Placeholder.configure({
+      placeholder: 'Tell your story…',
+    }),
+    Underline,
+    Link.configure({
+      openOnClick: false,
+      HTMLAttributes: { class: 'text-primary underline cursor-pointer' },
+    }),
+    Image.configure({
+      HTMLAttributes: { class: 'rounded-lg max-w-full my-4' },
+    }),
+    CodeBlock.configure({
+      HTMLAttributes: {
+        class: 'bg-surface-container-high text-on-surface font-code-sm text-sm rounded-lg p-4 my-4 overflow-x-auto',
+      },
+    }),
+    HorizontalRule,
+  ], []);
+
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        codeBlock: false,
-        horizontalRule: false,
-      }),
-      Placeholder.configure({
-        placeholder: 'Tell your story…',
-      }),
-      Underline,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: { class: 'text-primary underline cursor-pointer' },
-      }),
-      Image.configure({
-        HTMLAttributes: { class: 'rounded-lg max-w-full my-4' },
-      }),
-      CodeBlock.configure({
-        HTMLAttributes: {
-          class: 'bg-surface-container-high text-on-surface font-code-sm text-sm rounded-lg p-4 my-4 overflow-x-auto',
-        },
-      }),
-      HorizontalRule,
-    ],
+    extensions,
     content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());

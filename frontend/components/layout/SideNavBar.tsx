@@ -13,6 +13,7 @@ export default function SideNavBar() {
   const { user } = useAuth();
   const { sidebarOpen, setSidebarOpen } = useUIStore();
 
+  // Screen size detection: default to closed on mobile and open on desktop
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const handleResize = () => {
@@ -22,7 +23,10 @@ export default function SideNavBar() {
           setSidebarOpen(true);
         }
       };
+
+      // Set initial size
       handleResize();
+
       window.addEventListener('resize', handleResize);
       return () => window.removeEventListener('resize', handleResize);
     }
@@ -34,6 +38,7 @@ export default function SideNavBar() {
     { name: 'Bookmarks', icon: Bookmark, href: '/bookmarks' },
   ];
 
+  // Close mobile drawer on navigation click
   const handleLinkClick = () => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setSidebarOpen(false);
@@ -42,7 +47,7 @@ export default function SideNavBar() {
 
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* Mobile Drawer Backdrop Overlay */}
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div
@@ -52,29 +57,29 @@ export default function SideNavBar() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden cursor-pointer"
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden cursor-pointer"
           />
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
+      {/* Responsive Navigation Sidebar/Drawer */}
       <nav
-        className={`fixed md:sticky top-0 md:top-[57px] left-0 h-full md:h-[calc(100vh-57px)] bg-surface border-r border-outline-variant/20 flex flex-col z-50 md:z-30 shadow-2xl md:shadow-none transition-all duration-300 ease-in-out overflow-hidden ${
+        className={`fixed md:sticky top-0 md:top-16 left-0 h-full md:h-[calc(100vh-64px)] border-r border-white/5 py-6 bg-surface transition-all duration-300 ease-in-out overflow-hidden flex flex-col z-50 md:z-30 shadow-2xl md:shadow-none ${
           sidebarOpen
             ? 'w-[220px] translate-x-0 opacity-100 pointer-events-auto'
-            : 'w-[220px] md:w-0 -translate-x-full md:translate-x-0 md:opacity-0 md:px-0 md:pointer-events-none'
+            : 'w-[220px] md:w-0 -translate-x-full md:translate-x-0 md:border-r-0 md:opacity-0 md:px-0 md:pointer-events-none'
         }`}
       >
-        <div className="flex flex-col h-full py-4 px-3 w-[220px]">
+        <div className="flex flex-col h-full px-3 w-[220px]">
 
-          {/* Mobile Header */}
-          <div className="flex md:hidden items-center justify-between mb-6 px-2 pb-4 border-b border-outline-variant/20">
-            <span className="text-base font-bold text-on-surface">Menu</span>
+          {/* Mobile Drawer Header */}
+          <div className="flex md:hidden items-center justify-between mb-6 px-2 pb-4 border-b border-white/5">
+            <span className="font-headline-md text-base font-bold text-on-surface">Navigation</span>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-1.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all cursor-pointer"
+              className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-all cursor-pointer"
             >
-              <X className="size-4.5" />
+              <X className="size-4" />
             </button>
           </div>
 
@@ -88,57 +93,38 @@ export default function SideNavBar() {
                   href={item.href}
                   onClick={handleLinkClick}
                   id={`sidenav-${item.name.toLowerCase()}`}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group overflow-hidden select-none ${
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group select-none ${
                     isActive
-                      ? 'text-primary bg-primary/8 font-bold'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/60'
+                      ? 'bg-primary/10 text-primary font-semibold'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                   }`}
                 >
-                  {/* Active pill indicator */}
+                  {/* Active background glow */}
                   {isActive && (
                     <motion.div
                       layoutId="activeNavBackground"
-                      className="absolute inset-0 bg-primary/8 rounded-xl -z-10"
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      className="absolute inset-0 bg-primary/10 rounded-lg -z-10"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
 
-                  {/* Icon */}
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary/15 text-primary'
-                      : 'text-on-surface-variant group-hover:text-on-surface group-hover:bg-surface-container'
-                  }`}>
-                    <item.icon className="size-[17px]" />
-                  </div>
-
-                  <span className="text-sm font-semibold tracking-wide">{item.name}</span>
-
-                  {/* Active dot */}
-                  {isActive && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="ml-auto w-1.5 h-1.5 rounded-full bg-primary"
-                    />
-                  )}
+                  <item.icon className={`size-[18px] transition-colors duration-200 ${isActive ? 'text-primary' : 'text-on-surface-variant group-hover:text-on-surface'}`} />
+                  <span className="font-body-md text-sm">{item.name}</span>
                 </Link>
               );
             })}
           </div>
 
-          {/* Bottom: Write CTA */}
+          {/* Bottom: Write CTA for logged-in users */}
           {user && (
-            <div className="mt-auto pt-4 border-t border-outline-variant/20 px-1">
+            <div className="mt-auto pt-4 border-t border-white/5">
               <Link
                 href="/write"
                 onClick={handleLinkClick}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/15 transition-all duration-200 group select-none"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-all duration-200 group select-none"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center group-hover:bg-primary/25 transition-colors">
-                  <PenLine className="size-[16px]" />
-                </div>
-                <span className="text-sm font-bold">New Story</span>
+                <PenLine className="size-[17px]" />
+                <span className="font-body-md text-sm font-semibold">New Story</span>
               </Link>
             </div>
           )}

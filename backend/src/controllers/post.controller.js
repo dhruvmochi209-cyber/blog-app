@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Post, { PREDEFINED_CATEGORIES } from '../models/Post.model.js';
 import User from '../models/User.model.js';
 import { generateUniqueSlug } from '../utils/slug.utils.js';
@@ -161,6 +162,7 @@ export const getBySlug = async (req, res) => {
 
   const post = await Post.findOne(query)
     .populate('authorId', 'name avatar role')
+    .select('+viewedBy')
     .lean();
 
   if (!post) {
@@ -177,12 +179,28 @@ export const getBySlug = async (req, res) => {
       throw new AppError('Post not found.', 404); // Intentionally vague — don't reveal draft existence
     }
   } else {
-    // Increment view count asynchronously in the background for high performance
-    Post.updateOne({ _id: post._id }, { $inc: { views: 1 } }).catch(err => {
-      console.error('Failed to increment post views:', err);
-    });
-    post.views = (post.views || 0) + 1;
+    // Only increment view count if explicitly requested (prevents Next.js prefetching/SSR double counts)
+    if (req.query.incrementView === 'true') {
+      const viewerId = req.user?._id?.toString() || req.ip || req.headers['x-forwarded-for'] || 'unknown';
+      
+      if (viewerId !== 'unknown' && !post.viewedBy?.includes(viewerId)) {
+        Post.updateOne(
+          { _id: post._id, viewedBy: { $ne: viewerId } },
+          { 
+            $inc: { views: 1 },
+            $push: { viewedBy: viewerId }
+          }
+        ).catch(err => {
+          console.error('Failed to increment post views:', err);
+        });
+        
+        post.views = (post.views || 0) + 1;
+      }
+    }
   }
+
+  // Prevent leaking the viewedBy array to the frontend
+  delete post.viewedBy;
 
   res.status(200).json({ success: true, data: post });
 };
@@ -214,7 +232,7 @@ export const getMyPosts = async (req, res) => {
       .lean(),
     Post.countDocuments(filter),
     Post.aggregate([
-      { $match: { authorId: req.user._id } },
+      { $match: { authorId: new mongoose.Types.ObjectId(req.user._id) } },
       {
         $group: {
           _id: null,
@@ -225,7 +243,7 @@ export const getMyPosts = async (req, res) => {
       },
     ]),
     Post.aggregate([
-      { $match: { authorId: req.user._id } },
+      { $match: { authorId: new mongoose.Types.ObjectId(req.user._id) } },
       {
         $group: {
           _id: '$category',
@@ -236,7 +254,7 @@ export const getMyPosts = async (req, res) => {
       { $sort: { views: -1 } }
     ]),
     Post.aggregate([
-      { $match: { authorId: req.user._id, status: 'PUBLISHED' } },
+      { $match: { authorId: new mongoose.Types.ObjectId(req.user._id), status: 'PUBLISHED' } },
       {
         $group: {
           _id: {

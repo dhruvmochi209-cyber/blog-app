@@ -269,7 +269,7 @@ export const login = async (req, res) => {
 
   if (!user.passwordHash) {
     throw new AppError(
-      'This account uses social login. Please sign in with Google or GitHub.',
+      'This account uses social login. Please sign in with Google.',
       401
     );
   }
@@ -339,17 +339,6 @@ export const googleCallback = (req, res) => {
   );
 };
 
-// ─── GitHub OAuth Callback ────────────────────────────────────────────────────
-
-export const githubCallback = (req, res) => {
-  const user = req.user;
-  const accessToken = signAccessToken(user);
-  const refreshToken = signRefreshToken(user);
-  res.cookie('refreshToken', refreshToken, refreshCookieOptions);
-  res.redirect(
-    `${process.env.CLIENT_URL}/auth/oauth-callback?token=${accessToken}&provider=github`
-  );
-};
 
 // ─── Google One Tap ───────────────────────────────────────────────────────────
 

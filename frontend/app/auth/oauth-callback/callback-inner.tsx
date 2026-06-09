@@ -33,8 +33,8 @@ export default function OAuthCallbackInner() {
     window.history.replaceState({}, '', '/auth/oauth-callback');
 
     setTokenFromOAuth(token)
-      .then(() => router.replace('/onboarding'))
-      .catch(() => {
+      .then(() => router.replace('/feed'))
+      .catch((err) => {
         setErrorMsg('Failed to fetch your profile. Please try again.');
         setStatus('error');
       });

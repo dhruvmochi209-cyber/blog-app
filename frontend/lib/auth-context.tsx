@@ -76,6 +76,8 @@ const removeLastUser = () => {
   try { localStorage.removeItem(LAST_USER_KEY); } catch { /* noop */ }
 };
 
+let refreshPromise: Promise<string | null> | null = null;
+
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -109,10 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // ── On mount: silently try to restore session, then load last-user ───────
+  // ── Session Refresh ───────────────────────────────────────────────────────
 
-  useEffect(() => {
-    const restoreSession = async () => {
+  const refreshSession = useCallback(async () => {
+    if (refreshPromise) return refreshPromise;
+
+    refreshPromise = (async () => {
       try {
         const res = await fetch(`${API}/auth/refresh`, {
           method: 'POST',
@@ -120,20 +124,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         if (res.ok) {
           const data = await res.json();
-          // Session restored — log in immediately (no popup needed)
+          // Session restored — log in immediately
           commitUser(data.user, data.accessToken);
-          return;
+          return data.accessToken;
         }
-      } catch { /* network error — treat as no session */ }
+      } catch { /* network error */ }
+      return null;
+    })();
 
-      // No active session — read the last-user snapshot to show the popup
-      const snapshot = loadLastUser();
-      setLastUser(snapshot);
-
-      setLoading(false);
-    };
-    restoreSession();
+    const result = await refreshPromise;
+    refreshPromise = null;
+    return result;
   }, [commitUser]);
+
+  // ── On mount: silently try to restore session, then load last-user ───────
+
+  useEffect(() => {
+    const initSession = async () => {
+      const token = await refreshSession();
+      if (!token) {
+        // No active session — read the last-user snapshot to show the popup
+        const snapshot = loadLastUser();
+        setLastUser(snapshot);
+        setLoading(false);
+      }
+    };
+    initSession();
+  }, [refreshSession]);
 
   // When commitUser runs (session restored), we can stop loading
   useEffect(() => {
@@ -209,11 +226,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser({ ...user, bookmarks: newBookmarks });
 
     try {
-      const res = await fetch(`${API}/users/bookmarks/${postId}`, {
+      let currentToken = accessToken;
+      let res = await fetch(`${API}/users/bookmarks/${postId}`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${currentToken}` },
         credentials: 'include'
       });
+      
+      // If token expired, try to refresh and retry the request
+      if (res.status === 401) {
+        const newToken = await refreshSession();
+        if (newToken) {
+          currentToken = newToken;
+          res = await fetch(`${API}/users/bookmarks/${postId}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${currentToken}` },
+            credentials: 'include'
+          });
+        }
+      }
       
       const data = await res.json();
       if (res.ok && data.success) {

@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     
     if (res.ok && data.success && data.data) {
       const post = data.data;
-      const title = `${post.title} | Writen`;
-      const description = post.excerpt || 'Read this article on Writen.';
+      const title = `${post.title} | DevLog`;
+      const description = post.excerpt || 'Read this article on DevLog.';
       const keywords = post.seoKeywords ? post.seoKeywords.split(',').map((k: string) => k.trim()) : [];
       const images = post.coverImage ? [post.coverImage] : [];
 
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
   
   return {
-    title: 'Writen | Join the Conversation',
+    title: 'DevLog | Join the Conversation',
     description: 'The leading space for technical narratives.',
   };
 }

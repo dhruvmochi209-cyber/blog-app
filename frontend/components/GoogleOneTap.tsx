@@ -30,7 +30,7 @@ export default function GoogleOneTap() {
 
         if (res.ok && data.success) {
           await setTokenFromOAuth(data.accessToken);
-          router.push('/onboarding');
+          router.push('/feed');
         } else {
           setError(data.message || 'Google login failed');
         }

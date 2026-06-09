@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { TrendingUp, Hash, ArrowUpRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
@@ -25,7 +24,7 @@ export default function RightSidebar() {
         if (catRes.ok) {
           const catData = await catRes.json();
           if (catData.success && Array.isArray(catData.data)) {
-            setTopics(catData.data.slice(0, 10));
+            setTopics(catData.data.slice(0, 10)); // Top 10 categories
           }
         }
 
@@ -45,125 +44,110 @@ export default function RightSidebar() {
   }, []);
 
   return (
-    <aside className="hidden xl:flex flex-col w-[300px] flex-shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto no-scrollbar">
-      <div className="p-6 space-y-8">
+    <aside className="hidden lg:block w-[340px] flex-shrink-0 space-y-4 pt-8 px-0 overflow-y-auto no-scrollbar sticky top-16 h-[calc(100vh-64px)]">
 
-        {/* Trending Stories */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-lg bg-amber-500/15 flex items-center justify-center">
-              <TrendingUp className="size-3.5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant font-label-caps">
-              Trending
-            </h3>
+      {/* Trending Stories Section — stitch style */}
+      <section className="glass-card rounded-xl p-5">
+        <h3 className="font-mono text-xs text-on-surface-variant mb-4 px-1 tracking-widest uppercase">
+          TRENDING NOW
+        </h3>
+
+        {loading ? (
+          <div className="flex items-center gap-2 text-on-surface-variant/50 py-2">
+            <Loader2 className="size-4 animate-spin" />
+            <span className="text-xs">Loading stories...</span>
           </div>
-
-          {loading ? (
-            <div className="flex items-center gap-2 text-on-surface-variant/50 py-3">
-              <Loader2 className="size-4 animate-spin" />
-              <span className="text-xs">Loading...</span>
-            </div>
-          ) : staffPicks.length === 0 ? (
-            <p className="text-xs text-on-surface-variant py-2">No trending stories yet.</p>
-          ) : (
-            <div className="space-y-4">
-              {staffPicks.map((post, i) => (
-                <motion.div
-                  key={post._id}
-                  whileHover={{ x: 3 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  onClick={() => router.push(`/feed/${post.slug}`)}
-                  className="group cursor-pointer"
-                >
-                  <div className="flex gap-3">
-                    <span className="text-2xl font-black text-outline/30 font-headline-md leading-none mt-0.5 w-6 shrink-0 select-none">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        {post.authorId?.avatar ? (
-                          <img
-                            src={post.authorId.avatar}
-                            className="w-4 h-4 rounded-full object-cover border border-outline-variant/30"
-                            alt={post.authorId.name || 'Author'}
-                          />
-                        ) : (
-                          <div className="w-4 h-4 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-[9px] border border-primary/20">
-                            {post.authorId?.name?.charAt(0)?.toUpperCase() || '?'}
-                          </div>
-                        )}
-                        <span className="text-[11px] font-semibold text-on-surface-variant truncate">
-                          {post.authorId?.name || 'Unknown'}
-                        </span>
+        ) : staffPicks.length === 0 ? (
+          <div className="text-xs text-on-surface-variant py-2">No trending stories found.</div>
+        ) : (
+          <div className="space-y-4">
+            {staffPicks.map((post, i) => (
+              <a
+                key={post._id}
+                onClick={() => router.push(`/feed/${post.slug}`)}
+                className="flex gap-4 p-2 rounded-lg hover:bg-white/5 transition-colors group cursor-pointer"
+              >
+                <span className="font-headline-md font-bold text-outline-variant/60 group-hover:text-primary transition-colors text-lg leading-none pt-0.5 w-6 shrink-0 select-none">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    {post.authorId?.avatar ? (
+                      <img
+                        src={post.authorId.avatar}
+                        className="w-4 h-4 rounded-full object-cover border border-white/10"
+                        alt={post.authorId.name || 'Author'}
+                      />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-[9px]">
+                        {post.authorId?.name?.charAt(0)?.toUpperCase() || '?'}
                       </div>
-                      <h4 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors duration-200 leading-snug line-clamp-2 font-headline-md">
-                        {post.title}
-                      </h4>
-                    </div>
+                    )}
+                    <span className="text-xs text-on-surface-variant truncate font-medium">
+                      {post.authorId?.name || 'Unknown'}
+                    </span>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-
-          <Link
-            href="/explore"
-            id="rightsidebar-full-list"
-            className="inline-flex items-center gap-1 mt-5 text-primary text-xs font-bold tracking-wide uppercase hover:opacity-80 transition-opacity group font-label-caps"
-          >
-            See all stories
-            <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </Link>
-        </div>
-
-        {/* Divider */}
-        <div className="h-px bg-outline-variant/25" />
-
-        {/* Topics */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Hash className="size-3.5 text-primary" />
-            </div>
-            <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant font-label-caps">
-              Explore Topics
-            </h3>
+                  <h4 className="font-body-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors duration-200 leading-snug line-clamp-2">
+                    {post.title}
+                  </h4>
+                  {post.category && (
+                    <span className="text-xs text-on-surface-variant mt-1 block">
+                      {post.category}
+                    </span>
+                  )}
+                </div>
+              </a>
+            ))}
           </div>
+        )}
 
-          {loading ? (
-            <div className="flex items-center gap-2 text-on-surface-variant/50 py-3">
-              <Loader2 className="size-4 animate-spin" />
-              <span className="text-xs">Loading...</span>
-            </div>
-          ) : topics.length === 0 ? (
-            <p className="text-xs text-on-surface-variant py-2">No topics available.</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {topics.map((topic) => (
-                <motion.button
-                  key={topic}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => router.push('/explore')}
-                  id={`rightsidebar-topic-${topic.toLowerCase()}`}
-                  className="px-3.5 py-1.5 bg-surface-container-low hover:bg-primary/10 text-on-surface-variant hover:text-primary border border-outline-variant/30 hover:border-primary/30 rounded-full text-[11px] font-semibold transition-all duration-200 cursor-pointer select-none"
-                >
-                  {topic}
-                </motion.button>
-              ))}
-            </div>
-          )}
-        </div>
+        <Link
+          href="/explore"
+          id="rightsidebar-full-list"
+          className="inline-flex items-center gap-1 mt-4 px-2 text-primary text-xs font-semibold tracking-wide hover:opacity-80 transition-opacity group font-label-caps uppercase"
+        >
+          See Full List
+          <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+        </Link>
+      </section>
 
-        {/* Footer */}
-        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[10.5px] font-medium text-on-surface-variant/60 pt-4 border-t border-outline-variant/20">
-          {['Help', 'Status', 'About', 'Careers', 'Privacy', 'Terms'].map((label) => (
-            <Link key={label} href="#" className="hover:text-on-surface-variant transition-colors">
-              {label}
-            </Link>
-          ))}
-          <span className="w-full text-[10px] mt-1 opacity-50">© 2025 Writen Inc.</span>
-        </div>
+      {/* Recommended Topics Section — stitch style */}
+      <section>
+        <h3 className="font-mono text-xs text-on-surface-variant mb-3 px-1 tracking-widest uppercase">
+          POPULAR TAGS
+        </h3>
+
+        {loading ? (
+          <div className="flex items-center gap-2 text-on-surface-variant/50 py-2">
+            <Loader2 className="size-4 animate-spin" />
+            <span className="text-xs">Loading topics...</span>
+          </div>
+        ) : topics.length === 0 ? (
+          <div className="text-xs text-on-surface-variant py-2">No recommended topics available.</div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {topics.map((topic) => (
+              <button
+                key={topic}
+                onClick={() => router.push('/explore')}
+                id={`rightsidebar-topic-${topic.toLowerCase()}`}
+                className="px-3 py-1.5 bg-surface-container hover:bg-surface-variant rounded-lg border border-white/5 text-xs font-mono hover:text-primary transition-all duration-200 cursor-pointer select-none text-on-surface-variant"
+              >
+                #{topic}
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Footer Links */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[10.5px] font-medium text-on-surface-variant/50 pt-4 border-t border-white/5 px-1">
+        {['Help', 'Status', 'About', 'Careers', 'Privacy', 'Terms'].map((label) => (
+          <Link key={label} href="#" className="hover:text-on-surface-variant transition-colors">
+            {label}
+          </Link>
+        ))}
+        <span className="w-full text-[10px] mt-1 opacity-60">© 2025 DevLog Inc.</span>
       </div>
     </aside>
   );

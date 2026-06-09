@@ -55,7 +55,7 @@ export const toggleBookmark = async (req, res) => {
     user.bookmarks = [];
   }
 
-  const hasBookmarked = user.bookmarks.includes(postId);
+  const hasBookmarked = user.bookmarks.some(id => id.toString() === postId.toString());
 
   if (hasBookmarked) {
     // Remove it

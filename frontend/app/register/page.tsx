@@ -4,16 +4,22 @@ import { useState, useEffect, FormEvent, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Mail, 
-  User, 
-  Key, 
-  AlertTriangle, 
-  Loader2, 
-  ChevronLeft 
+import {
+  Mail,
+  User,
+  Key,
+  AlertTriangle,
+  Loader2,
+  Lock,
+  ArrowRight,
+  ShieldCheck,
+  EyeOff,
+  Eye,
+  CheckCircle2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { SocialLoginSection } from '@/components/auth/SocialLoginSection';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 const BACKEND = 'http://localhost:5001';
@@ -49,30 +55,13 @@ function OtpInput({ value, onChange }: { value: string; onChange: (v: string) =>
           value={d === ' ' ? '' : d}
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
-          className="
-            w-11 h-14 text-center font-code-sm text-xl font-bold
-            bg-surface border border-outline-variant/40 rounded-lg text-on-surface
-            focus:border-primary focus:ring-4 focus:ring-primary/5 focus:outline-none
-            transition-all caret-primary
-          "
+          className="w-11 h-14 text-center font-mono text-xl font-bold bg-surface-container-lowest/50 border border-white/10 rounded-lg text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all caret-primary"
         />
       ))}
     </div>
   );
 }
 
-// ─── Icons ─────────────────────────────────────────────────────────────────
-function GoogleIcon() {
-  return (
-    <img alt="Google" className="w-4.5 h-4.5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQ5L6Ha4PAKSJji5U_8Zt2BsvYl0FY1uG3nfQ_0nP140mRWZ_9bjpY-t7cIhkIzUDG8LHyuvRhPyqsqYnQmhgbKoO1HdDE-wvQuzM8PCpXIDfXXeLlXxdOItm3w2xetV0_xTfDXhyAzL4QvXVCQXmm4da-X8TIRChzBTGEjlyZ2t-g-FtlSsRrX1871oIMTQoPnHSwx9iBz9Ab3BHG61C7h6wFmRshNB-wzgJDrPenzR9XG8eJWGRPeu3FzbWyREmI5zFw6_oYZ1c" />
-  );
-}
-
-function GitHubIcon() {
-  return (
-    <svg className="w-4.5 h-4.5 fill-on-surface" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>
-  );
-}
 
 // ─── Page ──────────────────────────────────────────────────────────────────
 export default function RegisterPage() {
@@ -85,6 +74,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [otp, setOtp] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -93,12 +83,12 @@ export default function RegisterPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) router.replace('/onboarding');
+    if (!loading && user) router.replace('/feed');
   }, [user, loading, router]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
-    const t = setTimeout(() => setResendCooldown(c => c - 1), 1000);
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
     return () => clearTimeout(t);
   }, [resendCooldown]);
 
@@ -152,7 +142,7 @@ export default function RegisterPage() {
         return;
       }
       await setTokenFromOAuth(data.accessToken);
-      router.push('/onboarding');
+      router.push('/feed');
     } catch {
       setErrors(['Network error. Please try again.']);
     } finally {
@@ -183,25 +173,12 @@ export default function RegisterPage() {
   if (loading) return null;
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-center justify-center pt-24 pb-12 px-margin-mobile md:px-margin-desktop relative select-none selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
-      {/* hoisted document metadata for SEO */}
-      <title>Sign Up // Writen</title>
-      <meta name="description" content="Create a Writen account to read, draft, and publish technical publications." />
-
-      {/* Back Button */}
-      <Link 
-        href="/" 
-        id="register-back-btn"
-        className="absolute top-8 left-6 md:top-12 md:left-12 inline-flex items-center gap-2 font-label-caps text-xs font-bold uppercase tracking-wider text-secondary hover:text-on-surface transition-all duration-200 cursor-pointer group"
-      >
-        <ArrowLeft className="size-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
-        Go back to Home
-      </Link>
-
-      <div className="w-full max-w-[480px]">
-        <div className="bg-surface-container-low border border-outline-variant/30 rounded-2xl p-8 md:p-12 shadow-md relative z-10">
-          <AnimatePresence mode="wait">
-            
+    <AuthLayout
+      title="Sign Up"
+      description="Create a DevLog account to read, draft, and publish technical publications."
+      brandTagline="Architect Registration"
+    >
+      <AnimatePresence mode="wait">
             {step === 'form' ? (
               <motion.div
                 key="register-form"
@@ -210,77 +187,89 @@ export default function RegisterPage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="text-center mb-10 select-none">
-                  <h1 className="font-display-xl text-3xl font-black text-on-surface tracking-tight mb-2">Join the conversation</h1>
-                  <p className="font-body-md text-sm text-on-surface-variant font-light">The leading space for technical narratives.</p>
-                </div>
+                {/* Header */}
+                <header className="mb-6 text-center md:text-left">
+                  <h1 className="font-headline-md text-2xl font-bold text-on-surface mb-1.5">
+                    Join the Conversation
+                  </h1>
+                  <p className="font-body-md text-sm text-on-surface-variant">
+                    Create an account to read, draft, and publish your insights.
+                  </p>
+                </header>
 
-                {/* Third-party integrations */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <a href={`${BACKEND}/api/auth/google`} className="flex items-center justify-center gap-2.5 border border-outline-variant/30 py-3 rounded-full hover:bg-surface-container hover:border-outline transition-all cursor-pointer shadow-xs active:scale-[0.98] duration-200">
-                    <GoogleIcon />
-                    <span className="font-label-caps text-[10px] font-bold uppercase tracking-widest text-on-surface">Google</span>
-                  </a>
-                  <a href={`${BACKEND}/api/auth/github`} className="flex items-center justify-center gap-2.5 border border-outline-variant/30 py-3 rounded-full hover:bg-surface-container hover:border-outline transition-all cursor-pointer shadow-xs active:scale-[0.98] duration-200">
-                    <GitHubIcon />
-                    <span className="font-label-caps text-[10px] font-bold uppercase tracking-widest text-on-surface">GitHub</span>
-                  </a>
-                </div>
+                <SocialLoginSection backendUrl={BACKEND} />
 
-                {/* Divider */}
-                <div className="relative mb-8">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-outline-variant/30"></div>
-                  </div>
-                  <div className="relative flex justify-center text-[10px] uppercase tracking-wider font-bold text-on-surface-variant/80">
-                    <span className="bg-surface-container-low px-4 font-label-caps">or continue with email</span>
-                  </div>
-                </div>
-
-                <form onSubmit={handleInitRegister} className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="font-label-caps text-[10px] font-bold uppercase tracking-widest text-on-surface-variant block" htmlFor="username">Full Name</label>
-                    <input
-                      id="username"
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g., Ada Lovelace"
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md text-sm input-focus-ring focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-on-surface outline-none"
-                    />
+                {/* Email/Password Form */}
+                <form onSubmit={handleInitRegister} className="space-y-4">
+                  {/* Full Name */}
+                  <div className="space-y-1.5">
+                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="username">
+                      FULL NAME
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <input
+                        id="username"
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Jon Snow"
+                        className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="font-label-caps text-[10px] font-bold uppercase tracking-widest text-on-surface-variant block" htmlFor="email">Email address</label>
-                    <input
-                      id="email"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="ada@writen.engineering"
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md text-sm input-focus-ring focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-on-surface outline-none"
-                    />
+                  {/* Email */}
+                  <div className="space-y-1.5">
+                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="email">
+                      EMAIL ADDRESS
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <input
+                        id="email"
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="jon@devlog.com"
+                        className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="font-label-caps text-[10px] font-bold uppercase tracking-widest text-on-surface-variant block" htmlFor="password">Password</label>
-                    <input
-                      id="password"
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md text-sm input-focus-ring focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-on-surface outline-none"
-                    />
+                  {/* Password */}
+                  <div className="space-y-1.5">
+                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="password">
+                      PASSWORD
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full pl-10 pr-11 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+                      >
+                        {showPassword ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
+                      </button>
+                    </div>
                   </div>
 
+                  {/* Errors */}
                   {errors.length > 0 && (
-                    <div className="bg-error-container text-on-error-container px-4 py-3 rounded-xl text-xs font-semibold border border-error/15 space-y-1.5 flex flex-col items-start">
+                    <div className="bg-error-container/30 text-on-error-container px-4 py-3 rounded-lg text-xs font-semibold border border-error/20 space-y-1.5 flex flex-col items-start">
                       {errors.map((e, i) => (
-                        <div key={i} className="flex items-center gap-1.5 animate-pulse">
+                        <div key={i} className="flex items-center gap-1.5">
                           <AlertTriangle className="size-3.5 shrink-0" />
                           <span>{e}</span>
                         </div>
@@ -288,22 +277,29 @@ export default function RegisterPage() {
                     </div>
                   )}
 
+                  {/* Submit */}
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-primary text-on-primary font-label-caps text-xs font-bold uppercase tracking-wider py-4 rounded-full hover:opacity-90 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
+                    className="w-full mt-2 py-4 px-6 bg-primary text-on-primary font-headline-md text-base font-bold rounded-lg shadow-lg shadow-primary/10 hover:shadow-primary/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
                   >
-                    {submitting && <Loader2 className="animate-spin size-4" />}
-                    Create account
+                    {submitting ? (
+                      <><Loader2 className="animate-spin size-4" /> Processing...</>
+                    ) : (
+                      <>Create Account <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" /></>
+                    )}
                   </button>
                 </form>
 
-                <div className="mt-8 text-center border-t border-outline-variant/20 pt-6">
-                  <p className="font-body-md text-sm text-on-surface-variant font-light">
+                {/* Sign In link */}
+                <footer className="mt-6 text-center">
+                  <p className="font-body-md text-sm text-on-surface-variant">
                     Already have an account?{' '}
-                    <Link href="/login" className="text-primary font-bold hover:underline transition-all">Log in</Link>
+                    <Link href="/login" className="text-primary font-semibold hover:underline decoration-primary/30 underline-offset-4 transition-all">
+                      Sign In
+                    </Link>
                   </p>
-                </div>
+                </footer>
               </motion.div>
             ) : (
               <motion.div
@@ -312,23 +308,29 @@ export default function RegisterPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
+                className="text-center"
               >
-                <div className="text-center mb-10 select-none">
-                  <div className="w-12 h-12 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center mx-auto text-primary mb-4 animate-bounce">
+                <header className="mb-6">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary mb-4 animate-bounce">
                     <Mail className="size-5" />
                   </div>
-                  <h1 className="font-display-xl text-3xl font-black text-on-surface tracking-tight mb-2">Check your email</h1>
-                  <p className="font-body-md text-sm text-on-surface-variant font-light leading-relaxed">
-                    We sent a 6-digit verification code to <br />
-                    <span className="font-bold text-on-surface select-text">{pendingEmail}</span>
+                  <h1 className="font-headline-md text-2xl font-bold text-on-surface mb-1.5">Check your email</h1>
+                  <p className="font-body-md text-sm text-on-surface-variant mb-3">
+                    We sent a 6-digit verification code to:
                   </p>
-                </div>
+                  <div className="text-xs bg-surface-container px-3.5 py-1.5 rounded-full inline-block text-on-surface-variant font-bold border border-white/10">
+                    <span className="text-on-surface font-semibold">{pendingEmail}</span>
+                  </div>
+                </header>
 
-                <form onSubmit={handleVerifyOtp} className="space-y-8">
-                  <OtpInput value={otp} onChange={setOtp} />
+                <form onSubmit={handleVerifyOtp} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="font-mono text-[10px] text-on-surface-variant block text-center uppercase tracking-widest">Enter 6-Digit Code</label>
+                    <OtpInput value={otp} onChange={setOtp} />
+                  </div>
 
                   {errors.length > 0 && (
-                    <div className="bg-error-container text-on-error-container px-4 py-3 rounded-xl text-xs font-semibold border border-error/15 text-center flex items-center justify-center gap-1.5">
+                    <div className="bg-error-container/30 text-on-error-container px-4 py-3 rounded-lg text-xs font-semibold border border-error/20 text-center flex items-center justify-center gap-1.5">
                       <AlertTriangle className="size-4 shrink-0" />
                       <span>{errors[0]}</span>
                     </div>
@@ -337,25 +339,29 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={submitting || otp.length < 6}
-                    className="w-full bg-primary text-on-primary font-label-caps text-xs font-bold uppercase tracking-wider py-4 rounded-full hover:opacity-90 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
+                    className="w-full py-4 px-6 bg-primary text-on-primary font-headline-md text-base font-bold rounded-lg shadow-lg shadow-primary/10 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    {submitting && <Loader2 className="animate-spin size-4" />}
-                    Verify & Create Account
+                    {submitting ? <><Loader2 className="animate-spin size-4" /> Verifying...</> : 'Verify & Complete'}
                   </button>
                 </form>
 
-                <div className="mt-8 text-center border-t border-outline-variant/20 pt-6 select-none flex flex-col gap-3">
+                <div className="mt-8 text-center flex flex-col gap-3 pt-6 border-t border-white/10">
                   <p className="font-body-md text-xs text-on-surface-variant font-medium">
                     Didn't receive the email?{' '}
                     {resendCooldown > 0 ? (
                       <span className="font-bold">Resend in {resendCooldown}s</span>
                     ) : (
-                      <button onClick={handleResend} className="text-primary font-bold hover:underline bg-transparent border-0 cursor-pointer outline-none">Resend code</button>
+                      <button
+                        onClick={handleResend}
+                        className="text-primary font-bold hover:underline bg-transparent border-0 cursor-pointer outline-none"
+                      >
+                        Resend code
+                      </button>
                     )}
                   </p>
                   <button
                     onClick={() => { setStep('form'); setOtp(''); setErrors([]); }}
-                    className="text-xs font-semibold text-secondary hover:text-on-surface transition-colors bg-transparent border-0 cursor-pointer outline-none uppercase tracking-wider"
+                    className="font-mono text-[10px] text-on-surface-variant/80 hover:text-on-surface transition-colors cursor-pointer outline-none uppercase tracking-widest"
                   >
                     ← Change email address
                   </button>
@@ -364,8 +370,6 @@ export default function RegisterPage() {
             )}
 
           </AnimatePresence>
-        </div>
-      </div>
-    </main>
+    </AuthLayout>
   );
 }

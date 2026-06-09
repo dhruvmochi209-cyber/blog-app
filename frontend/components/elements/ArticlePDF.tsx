@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
   page: {
@@ -116,6 +116,17 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e5e7eb',
     marginVertical: 15,
   },
+  image: {
+    marginVertical: 12,
+    borderRadius: 6,
+    maxWidth: '100%',
+  },
+  coverImage: {
+    marginVertical: 15,
+    borderRadius: 8,
+    maxHeight: 250,
+    objectFit: 'cover',
+  }
 });
 
 function parseHtmlToPdfElements(html: string) {
@@ -163,6 +174,13 @@ function parseHtmlToPdfElements(html: string) {
           {el.textContent}
         </Text>
       );
+    } else if (tagName === 'img') {
+      const src = el.getAttribute('src');
+      if (src) {
+        elements.push(
+          <Image key={idx} src={src} style={styles.image} />
+        );
+      }
     } else if (tagName === 'ul' || tagName === 'ol') {
       el.childNodes.forEach((liNode, liIdx) => {
         if (liNode.textContent?.trim()) {
@@ -207,7 +225,7 @@ export default function ArticlePDF({ post, authorName }: ArticlePDFProps) {
       <Page size="A4" style={styles.page}>
         {/* Recurring Header */}
         <View style={styles.header} fixed>
-          <Text>Writen Engineering Blog</Text>
+          <Text>DevLog Engineering Blog</Text>
           <Text style={{ maxWidth: 220 }}>
             {headerTitle}
           </Text>
@@ -226,6 +244,11 @@ export default function ArticlePDF({ post, authorName }: ArticlePDFProps) {
           )}
         </View>
 
+        {/* Cover Image */}
+        {post.coverImage && (
+          <Image src={post.coverImage} style={styles.coverImage} />
+        )}
+
         {/* Content Body */}
         <View>
           {contentBlocks}
@@ -233,7 +256,7 @@ export default function ArticlePDF({ post, authorName }: ArticlePDFProps) {
 
         {/* Recurring Footer */}
         <View style={styles.footer} fixed>
-          <Text>writen.com</Text>
+          <Text>devlog.com</Text>
           <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
         </View>
       </Page>

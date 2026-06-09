@@ -24,7 +24,7 @@ export default function ProfileRedirect() {
   return (
     <div className="min-h-screen bg-background flex flex-col font-body-md">
       <TopNavBar />
-      <div className="flex-1 flex w-full">
+      <div className="flex-1 flex w-full pt-16">
         <SideNavBar />
         <main className="flex-1 flex items-center justify-center">
           <Loader2 className="size-8 text-primary animate-spin" />

@@ -38,7 +38,7 @@ export const useFormCacheStore = create<FormCacheState>()(
       }),
     }),
     {
-      name: 'writen-editor-form-cache', // key name in localStorage
+      name: 'devlog-editor-form-cache', // key name in localStorage
     }
   )
 );

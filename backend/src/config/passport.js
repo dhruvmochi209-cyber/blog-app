@@ -1,11 +1,10 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Strategy as GitHubStrategy } from 'passport-github2';
 import User from '../models/User.model.js';
 
 /**
- * Configures Passport.js with Google and GitHub OAuth strategies.
- * Both strategies follow the same pattern:
+ * Configures Passport.js with Google OAuth strategy.
+ * The strategy follows this pattern:
  *  1. Try to find an existing user by their OAuth provider ID.
  *  2. If not found, try to match by email (account linking).
  *  3. If still not found, create a brand-new user.
@@ -65,56 +64,6 @@ passport.use(
   )
 );
 
-// ─── GitHub Strategy ─────────────────────────────────────────────────────────
-
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_CALLBACK_URL,
-      scope: ['user:email'], // Request email access explicitly
-    },
-    async (_accessToken, _refreshToken, profile, done) => {
-      try {
-        // GitHub may return multiple emails; pick the primary one
-        const email =
-          profile.emails?.find((e) => e.primary)?.value ||
-          profile.emails?.[0]?.value ||
-          null;
-        const avatar = profile.photos?.[0]?.value || null;
-
-        // 1. Find by GitHub ID
-        let user = await User.findOne({ githubId: profile.id });
-
-        if (!user && email) {
-          // 2. Try account linking via email
-          user = await User.findOne({ email });
-          if (user) {
-            user.githubId = profile.id;
-            if (!user.avatar && avatar) user.avatar = avatar;
-            await user.save();
-          }
-        }
-
-        if (!user) {
-          // 3. Create new user
-          user = await User.create({
-            name: profile.displayName || profile.username || 'User',
-            email,
-            githubId: profile.id,
-            avatar,
-            passwordHash: null,
-          });
-        }
-
-        return done(null, user);
-      } catch (error) {
-        return done(error, null);
-      }
-    }
-  )
-);
 
 // ─── Minimal Session Stubs (we use JWT, not sessions) ────────────────────────
 

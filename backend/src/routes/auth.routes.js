@@ -10,7 +10,6 @@ import {
   logout,
   getMe,
   googleCallback,
-  githubCallback,
   googleOneTap,
   forgotPassword,
   resetPassword,
@@ -135,21 +134,5 @@ router.get(
  * and returns our own JWT tokens. Used by the One Tap popup.
  */
 router.post('/google/one-tap', authLimiter, googleOneTap);
-
-// ─── GitHub OAuth ─────────────────────────────────────────────────────────────
-
-router.get(
-  '/github',
-  passport.authenticate('github', { scope: ['user:email'], session: false })
-);
-
-router.get(
-  '/github/callback',
-  passport.authenticate('github', {
-    session: false,
-    failureRedirect: `${process.env.CLIENT_URL}/login?error=github_auth_failed`,
-  }),
-  githubCallback
-);
 
 export default router;
