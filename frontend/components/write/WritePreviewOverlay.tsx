@@ -52,7 +52,7 @@ export function WritePreviewOverlay({
           <article className="max-w-[720px] w-full mx-auto px-6 py-12 flex flex-col">
             {category && (
               <div className="mb-4">
-                <span className="px-3.5 py-1 bg-surface-container border border-outline-variant/30 text-on-surface text-[10px] rounded-full font-bold uppercase tracking-widest font-label-caps select-none">
+                <span className="px-3.5 py-1 bg-surface-container border border-outline-variant/30 text-on-surface text-xs rounded-full font-bold uppercase tracking-widest font-label-caps select-none">
                   {category}
                 </span>
               </div>
@@ -114,7 +114,7 @@ export function WritePreviewOverlay({
                     key={i}
                     className="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs rounded-full font-label-caps border border-outline-variant/20 flex items-center gap-0.5 font-bold uppercase tracking-wider"
                   >
-                    <span className="text-[10px] text-on-surface-variant/70">#</span>
+                    <span className="text-xs text-on-surface-variant/70">#</span>
                     {chip}
                   </span>
                 ))}

@@ -52,7 +52,7 @@ export function RelatedStories({ relatedLoading, relatedPosts, calculateReadingT
 
                 <div className="space-y-2">
                   {rPost.category && (
-                    <span className="inline-block px-2.5 py-0.5 bg-surface-container text-on-surface-variant rounded-full text-[9px] font-bold uppercase tracking-wider font-label-caps border border-outline-variant/20">
+                    <span className="inline-block px-2.5 py-0.5 bg-surface-container text-on-surface-variant rounded-full text-sm font-bold uppercase tracking-wider font-label-caps border border-outline-variant/20">
                       {rPost.category}
                     </span>
                   )}
@@ -75,7 +75,7 @@ export function RelatedStories({ relatedLoading, relatedPosts, calculateReadingT
                   </div>
                 )}
                 <div className="min-w-0">
-                  <span className="block font-body-md text-[11px] font-bold text-on-surface truncate leading-none">{rPost.authorId?.name || 'Anonymous'}</span>
+                  <span className="block font-body-md text-sm font-bold text-on-surface truncate leading-none">{rPost.authorId?.name || 'Anonymous'}</span>
                   <span className="block text-[9.5px] text-on-surface-variant font-medium mt-0.5 leading-none">
                     {calculateReadingTime(rPost.htmlContent)} min read
                   </span>

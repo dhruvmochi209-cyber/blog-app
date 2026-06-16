@@ -1,8 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -13,77 +13,69 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, title, description, brandTagline }: AuthLayoutProps) {
   return (
-    <main
-      className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
-      style={{
-        backgroundColor: '#0c1324',
-        backgroundImage: `
-          radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, rgba(173, 198, 255, 0.1) 0px, transparent 50%),
-          radial-gradient(at 50% 50%, rgba(15, 23, 42, 1) 0px, transparent 100%)
-        `,
-      }}
-    >
-      <title>{title} // DevLog</title>
+    <main className="min-h-screen w-full flex bg-[#0f172a] text-white">
+      <title>{title} // Application</title>
       <meta name="description" content={description} />
 
-      {/* Cinematic background — architectural dark building */}
-      <div className="fixed inset-0 z-0 opacity-30 pointer-events-none">
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23071428'/%3E%3Cstop offset='100%25' stop-color='%230c1f3f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='100%25' height='100%25'/%3E%3C/svg%3E")`,
-          }}
+      {/* LEFT SIDE: Abstract Artistic Background */}
+      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center p-12">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop)' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0c1324] via-[#0c1324]/80 to-transparent" />
+        {/* Dark Gradient Overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+
+        {/* Branding Content (Glassmorphism Card) */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative z-10 w-full max-w-xl p-10 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col items-center text-center mx-auto"
+        >
+          <h1 className="font-serif italic text-6xl md:text-7xl font-black text-white leading-[1.1] mb-6 drop-shadow-md tracking-tight">
+            Welcome to CodeNexus
+          </h1>
+          <p className="font-sans text-base text-indigo-50 leading-relaxed max-w-md mb-10 opacity-90">
+            {title === 'Sign In'
+              ? "We are so happy to have you here. It's great to see you again."
+              : "Enter your personal details and start your journey with us."}
+          </p>
+
+          <Link 
+            href={title === 'Sign In' ? '/register' : '/login'} 
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/30 backdrop-blur-md transition-all cursor-pointer font-bold text-white shadow-lg shadow-black/5 hover:scale-105 active:scale-95"
+          >
+            {title === 'Sign In' ? 'No account yet? Signup' : 'Already have an account? Signin'}
+          </Link>
+        </motion.div>
       </div>
 
-      {/* Floating particle dots */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: `${Math.random() * 2 + 1}px`,
-              height: `${Math.random() * 2 + 1}px`,
-              backgroundColor: 'rgba(173, 198, 255, 0.25)',
-              left: `${(i * 5.3) % 100}%`,
-              top: `${(i * 7.1) % 100}%`,
-              filter: 'blur(1px)',
-              animation: `float ${(i % 5) + 8}s ease-in-out infinite`,
-              animationDelay: `${(i * 0.4) % 4}s`,
-            }}
-          />
-        ))}
+      {/* RIGHT SIDE: Authentication Form (Minimalist Dark/Light) */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 relative bg-white overflow-y-auto text-gray-900">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-[480px] p-8 sm:p-10 border border-gray-200 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white"
+        >
+          {/* Header/Title */}
+          <div className="flex flex-col mb-10 text-left">
+            <h1 className="font-display-xl text-4xl font-black tracking-tight text-gray-900 mb-2">
+              {title}
+            </h1>
+            <p className="text-gray-500 font-body-md text-sm">
+              {description}
+            </p>
+          </div>
+
+          {/* Form Content */}
+          <div className="w-full">
+            {children}
+          </div>
+        </motion.div>
       </div>
-
-      {/* Main container */}
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 w-full max-w-[480px]"
-      >
-        {/* Brand header above card */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="flex items-center gap-2.5 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-primary/15 border border-primary/20 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary text-xl">terminal</span>
-            </div>
-            <span className="font-headline-md text-2xl font-bold text-primary tracking-tight">DevLog</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
-            <ShieldCheck className="size-3 text-primary" />
-            <span className="font-mono text-[10px] text-primary uppercase tracking-widest">{brandTagline}</span>
-          </div>
-        </div>
-
-        {/* Glass card */}
-        <div className="glass-card rounded-xl p-8 relative">
-          {children}
-        </div>
-      </motion.div>
     </main>
   );
 }

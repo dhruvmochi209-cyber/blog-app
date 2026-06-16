@@ -29,9 +29,9 @@ export function TagInput({ keywords, setKeywords, error, clearError }: TagInputP
           {keywordChips.map((chip, i) => (
             <span
               key={i}
-              className="px-2.5 py-0.5 bg-primary/5 text-primary text-[10px] rounded-full font-label-caps border border-primary/10 flex items-center gap-0.5 font-bold uppercase tracking-wider select-none"
+              className="px-2.5 py-0.5 bg-primary/5 text-primary text-xs rounded-full font-label-caps border border-primary/10 flex items-center gap-0.5 font-bold uppercase tracking-wider select-none"
             >
-              <span className="text-[9px] text-primary/70 mr-0.5">#</span>
+              <span className="text-sm text-primary/70 mr-0.5">#</span>
               {chip}
             </span>
           ))}

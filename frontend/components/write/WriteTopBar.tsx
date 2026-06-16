@@ -43,36 +43,36 @@ export function WriteTopBar({
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-outline-variant/30 px-6 py-3.5 flex justify-between items-center shadow-xs">
       <div className="flex items-center gap-4">
         <Link href="/feed" className="font-headline-md text-xl font-bold text-on-surface tracking-tight hover:opacity-85 transition-opacity">
-          DevLog
+          CodeNexus
         </Link>
 
         {/* Dynamic Sync Status Indicator */}
         <div className="h-6 flex items-center">
           {syncStatus === 'idle' && (
-            <span className="font-label-caps text-[10px] text-on-surface-variant/80 px-2.5 py-0.5 bg-surface-container border border-outline-variant/20 rounded-md select-none font-bold uppercase tracking-wider">
+            <span className="font-label-caps text-xs text-on-surface-variant/80 px-2.5 py-0.5 bg-surface-container border border-outline-variant/20 rounded-md select-none font-bold uppercase tracking-wider">
               Draft
             </span>
           )}
           {syncStatus === 'saving' && (
-            <span className="font-label-caps text-[10px] text-on-surface-variant/80 px-2.5 py-0.5 bg-surface-container border border-outline-variant/20 rounded-md select-none font-bold uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
+            <span className="font-label-caps text-xs text-on-surface-variant/80 px-2.5 py-0.5 bg-surface-container border border-outline-variant/20 rounded-md select-none font-bold uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
               <Loader2 className="animate-spin size-3 text-primary" />
               Saving...
             </span>
           )}
           {syncStatus === 'saved' && (
-            <span className="font-label-caps text-[10px] text-primary bg-primary/5 px-2.5 py-0.5 rounded-md border border-primary/25 select-none flex items-center gap-1.5 font-bold uppercase tracking-wider">
+            <span className="font-label-caps text-xs text-primary bg-primary/5 px-2.5 py-0.5 rounded-md border border-primary/25 select-none flex items-center gap-1.5 font-bold uppercase tracking-wider">
               <Cloud className="size-3" />
               Saved to cloud
             </span>
           )}
           {syncStatus === 'offline_saved' && (
-            <span className="font-label-caps text-[10px] text-amber-600 bg-amber-500/5 px-2.5 py-0.5 rounded-md border border-amber-500/20 select-none flex items-center gap-1.5 font-bold uppercase tracking-wider">
+            <span className="font-label-caps text-xs text-amber-600 bg-amber-500/5 px-2.5 py-0.5 rounded-md border border-amber-500/20 select-none flex items-center gap-1.5 font-bold uppercase tracking-wider">
               <WifiOff className="size-3" />
               Saved locally
             </span>
           )}
           {syncStatus === 'error' && (
-            <span className="font-label-caps text-[10px] text-error bg-error/5 px-2.5 py-0.5 rounded-md border border-error/20 select-none flex items-center gap-1.5 font-bold uppercase tracking-wider">
+            <span className="font-label-caps text-xs text-error bg-error/5 px-2.5 py-0.5 rounded-md border border-error/20 select-none flex items-center gap-1.5 font-bold uppercase tracking-wider">
               <AlertTriangle className="size-3" />
               Save failed
             </span>

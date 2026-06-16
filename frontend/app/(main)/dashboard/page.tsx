@@ -12,7 +12,7 @@ import { DeletePostModal } from '@/components/dashboard/DeletePostModal';
 import TopNavBar from '@/components/layout/TopNavBar';
 import SideNavBar from '@/components/layout/SideNavBar';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
 function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
@@ -214,24 +214,29 @@ export default function CreatorDashboard() {
           >
 
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-outline-variant/30">
-              <div>
-                <h1 className="font-display-xl text-3xl md:text-4xl font-black tracking-tight text-on-surface leading-tight">
-                  Creator Space
+            <div className="relative overflow-hidden rounded-3xl bg-surface-container-low border border-outline-variant/20 p-8 sm:p-10 mb-2 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+              
+              <div className="z-10">
+                <h1 className="font-display-xl text-3xl md:text-[2.5rem] font-black tracking-tight text-on-surface leading-tight mb-2">
+                  Author Workspace
                 </h1>
-                <p className="font-body-md text-sm text-on-surface-variant mt-1.5 leading-relaxed font-light">
-                  Analyze performance metrics and manage your published publications catalog.
+                <p className="font-body-md text-sm sm:text-base text-on-surface-variant leading-relaxed max-w-md">
+                  Manage your portfolio, track story performance, and edit your drafts all in one place.
                 </p>
               </div>
 
-              <Link
-                href="/write"
-                id="dashboard-write-story-btn"
-                className="bg-primary text-on-primary font-label-caps text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-full hover:opacity-90 transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
-              >
-                <Plus className="size-4" />
-                Write New Story
-              </Link>
+              <div className="z-10 shrink-0">
+                <Link
+                  href="/write"
+                  id="dashboard-write-story-btn"
+                  className="group relative inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-on-surface text-surface rounded-xl font-label-caps text-xs font-bold uppercase tracking-wider overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-xl"
+                >
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                  <Plus className="size-4 relative z-10" />
+                  <span className="relative z-10">New Story</span>
+                </Link>
+              </div>
             </div>
 
             {/* Error Notifications */}

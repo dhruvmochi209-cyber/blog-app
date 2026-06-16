@@ -16,7 +16,7 @@ import { DeleteDraftModal } from '@/components/write/DeleteDraftModal';
 import { WritePreviewOverlay } from '@/components/write/WritePreviewOverlay';
 import { ActiveBlocksList } from '@/components/write/ActiveBlocksList';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
 function slugify(text: string): string {
   return text
@@ -329,7 +329,7 @@ export default function WritePage() {
         setSyncStatus('saved');
 
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('devlog_offline_draft');
+          localStorage.removeItem('codenexus_offline_draft');
         }
 
         useFormCacheStore.getState().clearCache();
@@ -389,7 +389,7 @@ export default function WritePage() {
     };
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem('devlog_offline_draft', JSON.stringify({
+      localStorage.setItem('codenexus_offline_draft', JSON.stringify({
         postId,
         title,
         category,
@@ -424,7 +424,7 @@ export default function WritePage() {
         setSyncStatus('saved');
 
         if (typeof window !== 'undefined') {
-          localStorage.setItem('devlog_offline_draft', JSON.stringify({
+          localStorage.setItem('codenexus_offline_draft', JSON.stringify({
             postId: resData.data?._id || postId,
             title,
             category,
@@ -470,7 +470,7 @@ export default function WritePage() {
     };
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem('devlog_offline_draft', JSON.stringify({
+      localStorage.setItem('codenexus_offline_draft', JSON.stringify({
         postId,
         title,
         category,
@@ -532,7 +532,7 @@ export default function WritePage() {
       });
       const data = await res.json();
       if (data.success) {
-        localStorage.removeItem('devlog_offline_draft');
+        localStorage.removeItem('codenexus_offline_draft');
         useFormCacheStore.getState().clearCache();
         router.push('/dashboard');
       } else {
@@ -577,7 +577,7 @@ export default function WritePage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-background text-foreground flex flex-col font-body-md relative pb-32 transition-colors duration-300">
         {/* hoisted document metadata for SEO */}
-        <title>Write Story // DevLog</title>
+        <title>Write Story // CodeNexus</title>
         <meta name="description" content="Draft and format technical narratives. Focus on clean layouts, structured code blocks, and markdown alignments." />
 
         <WriteTopBar
@@ -610,12 +610,12 @@ export default function WritePage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
-              className="w-full bg-transparent font-headline-lg text-4xl md:text-5xl font-black text-on-surface placeholder:text-outline-variant/40 outline-none border-none leading-tight py-2 font-display-xl tracking-tight"
+              className="w-full bg-transparent font-headline-lg text-4xl md:text-[3.5rem] font-black text-on-surface placeholder:text-on-surface-variant/30 focus:placeholder:text-transparent outline-none border-none leading-tight py-4 font-display-xl tracking-tight transition-all"
             />
             {slug && (
               <p className="font-code-sm text-xs text-on-surface-variant/70 mt-1.5 flex items-center gap-1.5 font-mono select-none">
                 <LinkIcon className="size-3.5 text-secondary" />
-                devlog.com/blog/<span className="text-primary font-semibold">{slug}</span>
+                codenexus.com/blog/<span className="text-primary font-semibold">{slug}</span>
               </p>
             )}
             {errors.title && <p className="text-error text-xs font-semibold mt-1">{errors.title}</p>}

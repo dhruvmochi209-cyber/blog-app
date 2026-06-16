@@ -12,7 +12,7 @@ import RightSidebar from '@/components/layout/RightSidebar';
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function calculateReadingTime(htmlContent: string = '') {

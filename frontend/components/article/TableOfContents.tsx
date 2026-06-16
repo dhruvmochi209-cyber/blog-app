@@ -60,7 +60,7 @@ export function TableOfContents({ headings, activeHeadingId, readingTime }: Tabl
         </ul>
         
         {/* Sticky Footer Info */}
-        <div className="border-t border-outline-variant/30 pt-4 flex items-center justify-between text-[10px] text-on-surface-variant font-medium select-none">
+        <div className="border-t border-outline-variant/30 pt-4 flex items-center justify-between text-xs text-on-surface-variant font-medium select-none">
           <span className="flex items-center gap-1"><Clock className="size-3" /> {readingTime} min read</span>
           <span>{headings.length} sections</span>
         </div>

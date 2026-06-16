@@ -10,60 +10,51 @@ export function PostsTable({
   setDeletingPost 
 }: any) {
   return (
-    <div className="bg-surface-container-low border border-outline-variant/30 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-      <div className="px-6 py-4 border-b border-outline-variant/30 flex items-center justify-between bg-surface-container/20">
-        <h2 className="font-label-caps text-xs uppercase tracking-widest text-on-surface-variant font-bold select-none">
-          Your Publications ({posts.length})
+    <div className="flex flex-col gap-4 mt-6">
+      <div className="flex items-center justify-between px-1">
+        <h2 className="font-display-md text-xl font-bold text-on-surface select-none">
+          Recent Stories
         </h2>
+        <span className="text-xs font-semibold text-on-surface-variant bg-surface-container px-3 py-1 rounded-full">
+          {posts.length} {posts.length === 1 ? 'Entry' : 'Entries'}
+        </span>
       </div>
 
-      <div className="overflow-x-auto w-full">
+      <div className="w-full flex flex-col gap-3">
         {loading ? (
-          <div className="py-20 flex flex-col items-center justify-center gap-3">
+          <div className="py-20 flex flex-col items-center justify-center gap-3 bg-surface-container-low rounded-3xl border border-outline-variant/20">
             <Loader2 className="animate-spin text-primary size-7" />
-            <span className="font-label-caps text-xs text-on-surface-variant font-semibold tracking-wider animate-pulse">Syncing catalog index...</span>
+            <span className="font-label-caps text-xs text-on-surface-variant font-semibold tracking-wider animate-pulse">Loading workspace...</span>
           </div>
         ) : posts.length === 0 ? (
-          <div className="py-20 text-center space-y-4 px-4 max-w-sm mx-auto">
-            <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mx-auto text-secondary">
-              <FileText className="size-5 text-on-surface-variant" />
+          <div className="py-24 text-center space-y-4 px-4 bg-surface-container-low rounded-3xl border border-outline-variant/20">
+            <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto shadow-sm">
+              <FileText className="size-6 text-on-surface-variant" />
             </div>
             <div className="space-y-2">
-              <p className="font-headline-md text-base font-bold text-on-surface uppercase tracking-tight">No publications found</p>
-              <p className="font-body-md text-xs text-on-surface-variant leading-relaxed font-light">
-                You haven't authored any publications yet. Click "Write New Story" above to draft your technical masterpiece!
+              <p className="font-headline-md text-lg font-bold text-on-surface tracking-tight">Your workspace is empty</p>
+              <p className="font-body-md text-sm text-on-surface-variant leading-relaxed max-w-sm mx-auto">
+                Start your writing journey. Click "New Story" to create your first draft.
               </p>
             </div>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-surface-container/10 border-b border-outline-variant/30 select-none">
-                <th className="font-label-caps text-[10px] font-bold text-on-surface-variant/80 uppercase px-6 py-3.5 tracking-wider">Article Title</th>
-                <th className="hidden sm:table-cell font-label-caps text-[10px] font-bold text-on-surface-variant/80 uppercase px-6 py-3.5 tracking-wider w-[130px]">Category</th>
-                <th className="hidden xs:table-cell font-label-caps text-[10px] font-bold text-on-surface-variant/80 uppercase px-6 py-3.5 tracking-wider w-[100px] text-center">Views</th>
-                <th className="hidden md:table-cell font-label-caps text-[10px] font-bold text-on-surface-variant/80 uppercase px-6 py-3.5 tracking-wider w-[140px]">Last Updated</th>
-                <th className="font-label-caps text-[10px] font-bold text-on-surface-variant/80 uppercase px-6 py-3.5 tracking-wider w-[140px] text-center">Status</th>
-                <th className="font-label-caps text-[10px] font-bold text-on-surface-variant/80 uppercase px-6 py-3.5 tracking-wider w-[100px] text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-variant/20">
-              {posts.map((post: any) => {
-                const isTransitioning = transitioningDeleteIds.includes(post._id);
+          <div className="flex flex-col gap-3">
+            {posts.map((post: any) => {
+              const isTransitioning = transitioningDeleteIds.includes(post._id);
 
-                return (
-                  <PostListItem
-                    key={post._id}
-                    post={post}
-                    isTransitioning={isTransitioning}
-                    isToggling={togglingId === post._id}
-                    onToggleStatus={handleToggleStatus}
-                    onDeleteClick={setDeletingPost}
-                  />
-                );
-              })}
-            </tbody>
-          </table>
+              return (
+                <PostListItem
+                  key={post._id}
+                  post={post}
+                  isTransitioning={isTransitioning}
+                  isToggling={togglingId === post._id}
+                  onToggleStatus={handleToggleStatus}
+                  onDeleteClick={setDeletingPost}
+                />
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

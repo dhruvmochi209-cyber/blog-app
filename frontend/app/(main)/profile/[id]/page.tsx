@@ -10,7 +10,7 @@ import TopNavBar from '@/components/layout/TopNavBar';
 import SideNavBar from '@/components/layout/SideNavBar';
 import { useAuth } from '@/lib/auth-context';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function calculateReadingTime(htmlContent: string = '') {
@@ -147,7 +147,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                                 </div>
                               )}
                               {post.category && (
-                                <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md text-on-surface font-label-caps text-[9px] uppercase tracking-widest font-black px-2.5 py-1 rounded-md shadow-sm">
+                                <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md text-on-surface font-label-caps text-sm uppercase tracking-widest font-black px-2.5 py-1 rounded-md shadow-sm">
                                   {post.category}
                                 </div>
                               )}
@@ -159,7 +159,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                               <p className="font-body-md text-sm text-on-surface-variant line-clamp-2 mb-4 flex-1 font-light">
                                 {post.excerpt}
                               </p>
-                              <div className="flex items-center justify-between text-[11px] font-label-caps font-bold tracking-widest uppercase text-on-surface-variant mt-auto pt-4 border-t border-outline-variant/20">
+                              <div className="flex items-center justify-between text-sm font-label-caps font-bold tracking-widest uppercase text-on-surface-variant mt-auto pt-4 border-t border-outline-variant/20">
                                 <span>{formatDate(post.createdAt)}</span>
                                 <span>{readTime} MIN READ</span>
                               </div>

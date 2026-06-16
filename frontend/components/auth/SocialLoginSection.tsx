@@ -16,25 +16,25 @@ interface SocialLoginSectionProps {
 export function SocialLoginSection({ backendUrl }: SocialLoginSectionProps) {
   return (
     <>
+      {/* Divider */}
+      <div className="relative flex items-center justify-center mb-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <span className="relative px-4 font-mono text-xs text-gray-500 bg-white backdrop-blur-md uppercase tracking-widest">
+          OR CONTINUE WITH
+        </span>
+      </div>
+
       {/* Social Auth Buttons */}
       <div className="grid grid-cols-1 gap-4 mb-6">
         <a
           href={`${backendUrl}/api/auth/google`}
-          className="flex items-center justify-center gap-3 py-3 px-4 bg-surface-container-highest/50 hover:bg-surface-container-highest transition-all rounded-lg border border-white/5 glow-hover active:scale-[0.98] duration-200 cursor-pointer"
+          className="flex items-center justify-center gap-3 py-3 px-4 bg-white hover:bg-gray-50 transition-all rounded-lg border border-gray-200 shadow-sm active:scale-[0.98] duration-200 cursor-pointer"
         >
           <GoogleIcon />
-          <span className="font-body-md text-sm font-medium text-on-surface">Google</span>
+          <span className="font-body-md text-sm font-medium text-gray-900">Google</span>
         </a>
-      </div>
-
-      {/* Divider */}
-      <div className="relative flex items-center justify-center mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/10" />
-        </div>
-        <span className="relative px-4 font-mono text-[10px] text-on-surface-variant bg-surface-container/80 backdrop-blur-md uppercase tracking-widest">
-          OR CONTINUE WITH
-        </span>
       </div>
     </>
   );

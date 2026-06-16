@@ -50,10 +50,9 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
   const [loading, setLoading] = useState(!initialPost);
   const [error, setError] = useState('');
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
   const [headings, setHeadings] = useState<HeadingItem[]>([]);
   const [activeHeadingId, setActiveHeadingId] = useState<string>('');
-  
+
   // Related posts state
   const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
   const [relatedLoading, setRelatedLoading] = useState(true);
@@ -85,7 +84,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
         if (accessToken) {
           headers['Authorization'] = `Bearer ${accessToken}`;
         }
-        
+
         // Only increment the view on the very first client-side fetch per session
         const shouldIncrement = !hasIncrementedView.current;
         if (shouldIncrement) {
@@ -93,7 +92,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
         }
         const incrementParam = shouldIncrement ? '?incrementView=true' : '';
         const res = await fetch(`${API}/posts/${slug}${incrementParam}`, { headers });
-        
+
         const data = await res.json();
         if (res.ok && data.success && data.data) {
           setPost(data.data);
@@ -139,14 +138,14 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
       const doc = parser.parseFromString(post.htmlContent, 'text/html');
       const headingElements = doc.querySelectorAll('h2, h3');
       const items: HeadingItem[] = [];
-      
+
       headingElements.forEach((el, idx) => {
         const text = el.textContent || '';
         const id = text
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/(^-|-$)/g, '');
-        
+
         items.push({
           id: id || `heading-${idx}`,
           text,
@@ -196,7 +195,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const headingElements = doc.querySelectorAll('h2, h3');
-    
+
     headingElements.forEach((el, idx) => {
       const text = el.textContent || '';
       const id = text
@@ -254,7 +253,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
     try {
       const { pdf } = await import('@react-pdf/renderer');
       const { default: ArticlePDF } = await import('@/components/elements/ArticlePDF');
-      
+
       const blob = await pdf(<ArticlePDF post={post} authorName={post.authorId?.name || 'Anonymous'} />).toBlob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -302,18 +301,6 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
     }
   };
 
-  // Font size multiplier class mapping
-  const getFontSizeClass = () => {
-    switch (fontSize) {
-      case 'large':
-        return 'text-xl md:text-2xl leading-relaxed font-serif';
-      case 'xlarge':
-        return 'text-2xl md:text-3xl leading-loose font-serif';
-      default:
-        return 'text-lg leading-relaxed font-serif';
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
       <TopNavBar />
@@ -322,15 +309,15 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
       <div className="fixed top-[61px] left-0 right-0 h-0.5 bg-outline-variant/20 z-50">
         <div className="h-full bg-primary transition-all duration-75" style={{ width: `${scrollProgress}%` }} />
       </div>
-      
+
       <div className="flex-1 flex w-full">
         <SideNavBar />
-        
+
         <main className="flex-1 flex justify-center py-10 px-margin-mobile md:px-margin-desktop relative bg-background">
-          
+
           {/* Back Navigation Button */}
-          <Link 
-            href="/feed" 
+          <Link
+            href="/feed"
             id="postreader-back-btn"
             className="absolute top-8 left-6 md:top-10 md:left-12 inline-flex items-center gap-2 font-label-caps text-xs font-bold uppercase tracking-wider text-secondary hover:text-on-surface transition-all duration-200 cursor-pointer group"
           >
@@ -339,7 +326,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
           </Link>
 
           <div className="w-full max-w-[1080px] pt-12 flex gap-12 justify-center">
-            
+
             {loading ? (
               <DetailsPageSkeleton />
             ) : error ? (
@@ -350,7 +337,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                 <div className="space-y-2">
                   <h1 className="font-headline-md text-xl font-black uppercase tracking-tight text-on-surface">Article Not Found</h1>
                   <p className="font-body-md text-sm text-on-surface-variant max-w-sm mx-auto leading-relaxed">
-                    {error === 'Post not found.' 
+                    {error === 'Post not found.'
                       ? 'The story you are looking for might have been moved, deleted, or is currently saved as a draft.'
                       : error}
                   </p>
@@ -363,47 +350,22 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
               <>
                 {/* Left Column: Article Content */}
                 <div className="w-full max-w-[720px] shrink-1">
-                  <motion.article 
+                  <motion.article
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                     className="space-y-8 pb-20"
                   >
-                    
-                    {/* Header Category Tag & Font Controls */}
+
+                    {/* Header Category Tag */}
                     <div className="flex justify-between items-center">
                       {post.category ? (
-                        <span className="inline-block px-3 py-1 bg-surface-container border border-outline-variant/30 text-on-surface rounded-full text-[10px] font-bold uppercase tracking-widest font-label-caps select-none">
+                        <span className="inline-block px-3 py-1 bg-surface-container border border-outline-variant/30 text-on-surface rounded-full text-xs font-bold uppercase tracking-widest font-label-caps select-none">
                           {post.category}
                         </span>
                       ) : (
                         <span />
                       )}
-                      
-                      {/* Premium Text Resizer Widget */}
-                      <div className="font-controls-widget flex items-center gap-1.5 bg-surface-container-low border border-outline-variant/50 rounded-full p-1 shadow-xs">
-                        <button
-                          onClick={() => setFontSize('normal')}
-                          className={`px-2.5 py-1 text-xs font-bold rounded-full transition-all active:scale-95 ${fontSize === 'normal' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
-                          title="Default Text"
-                        >
-                          A
-                        </button>
-                        <button
-                          onClick={() => setFontSize('large')}
-                          className={`px-2.5 py-1 text-xs font-bold rounded-full transition-all active:scale-95 ${fontSize === 'large' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
-                          title="Large Text"
-                        >
-                          A+
-                        </button>
-                        <button
-                          onClick={() => setFontSize('xlarge')}
-                          className={`px-2.5 py-1 text-xs font-bold rounded-full transition-all active:scale-95 ${fontSize === 'xlarge' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
-                          title="Extra Large Text"
-                        >
-                          A++
-                        </button>
-                      </div>
                     </div>
 
                     {/* Article Title */}
@@ -416,10 +378,10 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                       <div className="flex items-center gap-3">
                         <Link href={`/profile/${post.authorId?._id || ''}`} className="flex items-center gap-3 group/author">
                           {post.authorId?.avatar ? (
-                            <img 
-                              src={post.authorId.avatar} 
-                              className="w-10 h-10 rounded-full object-cover border border-outline-variant/20 group-hover/author:border-primary transition-colors" 
-                              alt={post.authorId.name || 'Author'} 
+                            <img
+                              src={post.authorId.avatar}
+                              className="w-10 h-10 rounded-full object-cover border border-outline-variant/20 group-hover/author:border-primary transition-colors"
+                              alt={post.authorId.name || 'Author'}
                             />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-primary/5 text-primary flex items-center justify-center font-bold text-sm border border-primary/10 group-hover/author:border-primary transition-colors select-none">
@@ -430,7 +392,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                             <div className="flex items-center gap-2">
                               <span className="font-body-md text-sm text-on-surface font-semibold group-hover/author:text-primary transition-colors">{post.authorId?.name || 'Anonymous'}</span>
                               {post.authorId?.role === 'CREATOR' && (
-                                <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold font-label-caps uppercase select-none">Creator</span>
+                                <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold font-label-caps uppercase select-none">Creator</span>
                               )}
                             </div>
                             <div className="flex items-center gap-2.5 text-xs text-on-surface-variant font-medium mt-0.5">
@@ -446,40 +408,40 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                     {/* Optional Cover Image Banner */}
                     {post.coverImage && (
                       <div className="w-full aspect-[2/1] overflow-hidden rounded-xl border border-outline-variant/35 bg-surface-container-low shadow-sm">
-                        <img 
-                          src={post.coverImage} 
-                          className="w-full h-full object-cover animate-in zoom-in-95 duration-500" 
-                          alt={post.title} 
+                        <img
+                          src={post.coverImage}
+                          className="w-full h-full object-cover animate-in zoom-in-95 duration-500"
+                          alt={post.title}
                         />
                       </div>
                     )}
 
-                    {/* Rich-Text Content Column with Dynamic Text Resizing */}
-                    <div className={`tiptap text-on-surface/90 pt-4 prose prose-zinc max-w-none ${getFontSizeClass()}`}>
+                    {/* Rich-Text Content Column */}
+                    <div className="tiptap text-on-surface/90 pt-4 prose prose-zinc max-w-none text-lg leading-relaxed font-serif">
                       <div dangerouslySetInnerHTML={{ __html: getProcessedHtml(post.htmlContent) }} />
                     </div>
 
-                    <InteractionDock 
-                      post={post} 
-                      pdfDownloading={pdfDownloading} 
-                      onDownloadPDF={handleDownloadPDF} 
+                    <InteractionDock
+                      post={post}
+                      pdfDownloading={pdfDownloading}
+                      onDownloadPDF={handleDownloadPDF}
                     />
 
                   </motion.article>
 
                   {/* Related Narratives Section */}
-                  <RelatedStories 
-                    relatedLoading={relatedLoading} 
-                    relatedPosts={relatedPosts} 
-                    calculateReadingTime={calculateReadingTime} 
+                  <RelatedStories
+                    relatedLoading={relatedLoading}
+                    relatedPosts={relatedPosts}
+                    calculateReadingTime={calculateReadingTime}
                   />
                 </div>
 
                 {/* Right Column: Sticky Table of Contents Sidebar */}
-                <TableOfContents 
-                  headings={headings} 
-                  activeHeadingId={activeHeadingId} 
-                  readingTime={calculateReadingTime(post.htmlContent)} 
+                <TableOfContents
+                  headings={headings}
+                  activeHeadingId={activeHeadingId}
+                  readingTime={calculateReadingTime(post.htmlContent)}
                 />
               </>
             ) : null}
@@ -488,4 +450,4 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
       </div>
     </div>
   );
-}
+} 

@@ -45,7 +45,7 @@ export default function TopNavBar() {
   };
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-white/5 shadow-sm">
+    <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant shadow-sm">
       <nav className="flex justify-between items-center h-16 px-6 w-full">
 
         {/* Left: Logo + Categories */}
@@ -64,9 +64,9 @@ export default function TopNavBar() {
           <Link
             href="/feed"
             id="topnavbar-logo"
-            className="font-headline-md text-xl font-bold text-primary tracking-tight select-none"
+            className="font-headline-md text-3xl font-black text-primary tracking-tight select-none"
           >
-            DevLog
+            CodeNexus
           </Link>
 
 
@@ -75,7 +75,7 @@ export default function TopNavBar() {
         {/* Right: Search + Actions */}
         <div className="flex items-center gap-3">
           {/* Search trigger */}
-          <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-white/5 text-on-surface-variant hover:bg-surface-variant/50 transition-all">
+          <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-variant/50 transition-all">
             <Search className="size-5 shrink-0" />
             <input
               value={searchVal}
@@ -87,28 +87,25 @@ export default function TopNavBar() {
             <kbd className="font-mono text-xs bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface-variant">⌘K</kbd>
           </form>
 
-          {/* Mobile search icon */}
-          <button className="md:hidden p-2 text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
-            <Search className="size-5" />
-          </button>
+          {/* Mobile search input toggle */}
+          <form onSubmit={handleSearchSubmit} className="md:hidden flex items-center relative group">
+            <input
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
+              className="absolute right-0 w-0 focus:w-48 bg-surface-container px-3 py-1.5 rounded-full border border-outline-variant text-sm focus:outline-none transition-all duration-300 ease-in-out opacity-0 focus:opacity-100 z-20 text-on-surface"
+              placeholder="Search..."
+              type="text"
+            />
+            <button type="button" onClick={(e) => { (e.currentTarget.previousElementSibling as HTMLInputElement)?.focus(); }} className="p-2 z-30 bg-surface text-on-surface-variant hover:text-primary rounded-full transition-colors cursor-pointer group-focus-within:bg-transparent">
+              <Search className="size-5" />
+            </button>
+          </form>
 
-          <div className="h-6 w-px bg-white/10 hidden md:block" />
+          <div className="h-6 w-px bg-outline-variant hidden md:block" />
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 text-on-surface-variant hover:text-primary rounded-full transition-all duration-200 cursor-pointer"
-            title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
-          >
-            {theme === 'light' ? <Moon className="size-[18px]" /> : <Sun className="size-[18px]" />}
-          </button>
+          {/* Theme Toggle Removed */}
 
-          {/* Notifications */}
-          <button className="p-2 text-on-surface-variant hover:text-primary rounded-full transition-all duration-200 cursor-pointer">
-            <Bell className="size-[18px]" />
-          </button>
-
-          {/* Write Button */}
+          {/* Theme Toggle Removed */}
           {user ? (
             <Link
               href="/write"

@@ -225,7 +225,7 @@ export default function ArticlePDF({ post, authorName }: ArticlePDFProps) {
       <Page size="A4" style={styles.page}>
         {/* Recurring Header */}
         <View style={styles.header} fixed>
-          <Text>DevLog Engineering Blog</Text>
+          <Text>CodeNexus Engineering Blog</Text>
           <Text style={{ maxWidth: 220 }}>
             {headerTitle}
           </Text>
@@ -256,7 +256,7 @@ export default function ArticlePDF({ post, authorName }: ArticlePDFProps) {
 
         {/* Recurring Footer */}
         <View style={styles.footer} fixed>
-          <Text>devlog.com</Text>
+          <Text>codenexus.com</Text>
           <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
         </View>
       </Page>

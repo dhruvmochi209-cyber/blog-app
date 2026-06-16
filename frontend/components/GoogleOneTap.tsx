@@ -13,7 +13,7 @@ export default function GoogleOneTap() {
   const pathname = usePathname();
   const [error, setError] = useState('');
 
-  const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/';
+  const isAuthPage = pathname === '/login' || pathname === '/register';
 
   useGoogleOneTapLogin({
     onSuccess: async (credentialResponse: CredentialResponse) => {
@@ -41,7 +41,7 @@ export default function GoogleOneTap() {
     onError: () => setError('Google One-Tap failed'),
     // Only prompt if we are not loading, have no session, and are on /login or /register
     disabled: loading || user !== null || !isAuthPage,
-    use_fedcm_for_prompt: false,
+    use_fedcm_for_prompt: true,
     cancel_on_tap_outside: false,
   });
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import ArticleReaderClient from './ArticleReaderClient';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
 interface Params {
   slug: string;
@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     
     if (res.ok && data.success && data.data) {
       const post = data.data;
-      const title = `${post.title} | DevLog`;
-      const description = post.excerpt || 'Read this article on DevLog.';
+      const title = `${post.title} | CodeNexus`;
+      const description = post.excerpt || 'Read this article on CodeNexus.';
       const keywords = post.seoKeywords ? post.seoKeywords.split(',').map((k: string) => k.trim()) : [];
       const images = post.coverImage ? [post.coverImage] : [];
 
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
   
   return {
-    title: 'DevLog | Join the Conversation',
+    title: 'CodeNexus | Join the Conversation',
     description: 'The leading space for technical narratives.',
   };
 }

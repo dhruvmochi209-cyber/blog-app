@@ -61,7 +61,7 @@ export function PostGridCard({ post, isBookmarked, onBookmarkToggle, variant = '
             className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
           />
           {!isGlass && post.category && (
-            <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md text-on-surface font-label-caps text-[9px] uppercase tracking-widest font-black px-2.5 py-1 rounded-md shadow-sm">
+            <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md text-on-surface font-label-caps text-sm uppercase tracking-widest font-black px-2.5 py-1 rounded-md shadow-sm">
               {post.category}
             </div>
           )}
@@ -70,9 +70,9 @@ export function PostGridCard({ post, isBookmarked, onBookmarkToggle, variant = '
         !isGlass && (
           <div className="h-48 bg-surface-container-low overflow-hidden relative w-full flex flex-col items-center justify-center text-on-surface-variant/40 group-hover:scale-105 transition-transform duration-500">
             <ImageIcon className="size-10 mb-2 opacity-50" />
-            <span className="font-label-caps text-[10px] uppercase tracking-widest font-bold">No Cover</span>
+            <span className="font-label-caps text-xs uppercase tracking-widest font-bold">No Cover</span>
             {post.category && (
-              <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md text-on-surface font-label-caps text-[9px] uppercase tracking-widest font-black px-2.5 py-1 rounded-md shadow-sm">
+              <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md text-on-surface font-label-caps text-sm uppercase tracking-widest font-black px-2.5 py-1 rounded-md shadow-sm">
                 {post.category}
               </div>
             )}
@@ -100,7 +100,7 @@ export function PostGridCard({ post, isBookmarked, onBookmarkToggle, variant = '
             {author.avatar ? (
               <img src={author.avatar} alt={author.name} className="w-6 h-6 rounded-full object-cover shadow-xs group-hover/author:border-primary border border-transparent transition-colors" />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] group-hover/author:opacity-80 transition-opacity">
+              <div className="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs group-hover/author:opacity-80 transition-opacity">
                 {getAvatarFallback(author.name)}
               </div>
             )}
@@ -118,7 +118,7 @@ export function PostGridCard({ post, isBookmarked, onBookmarkToggle, variant = '
         </p>
 
         {/* Footer */}
-        <div className={isGlass ? "pt-3 border-t border-white/5 flex items-center justify-between mt-auto" : "flex items-center justify-between text-[11px] font-label-caps font-bold tracking-widest uppercase text-on-surface-variant mt-auto pt-4 border-t border-outline-variant/20"}>
+        <div className={isGlass ? "pt-3 border-t border-white/5 flex items-center justify-between mt-auto" : "flex items-center justify-between text-sm font-label-caps font-bold tracking-widest uppercase text-on-surface-variant mt-auto pt-4 border-t border-outline-variant/20"}>
           {isGlass ? (
             <div className="flex items-center gap-3">
               <Link
@@ -129,7 +129,7 @@ export function PostGridCard({ post, isBookmarked, onBookmarkToggle, variant = '
                 {author.avatar ? (
                   <img src={author.avatar} className="w-5 h-5 rounded-full object-cover border border-white/10" alt={author.name} />
                 ) : (
-                  <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px]">
+                  <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
                     {getAvatarFallback(author.name)}
                   </div>
                 )}

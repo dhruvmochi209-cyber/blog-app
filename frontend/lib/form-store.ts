@@ -38,7 +38,7 @@ export const useFormCacheStore = create<FormCacheState>()(
       }),
     }),
     {
-      name: 'devlog-editor-form-cache', // key name in localStorage
+      name: 'codenexus-editor-form-cache', // key name in localStorage
     }
   )
 );

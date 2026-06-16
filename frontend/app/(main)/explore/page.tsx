@@ -11,7 +11,7 @@ import { PostGridCard } from '@/components/post/PostGridCard';
 import RightSidebar from '@/components/layout/RightSidebar';
 import { useAuth } from '@/lib/auth-context';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function calculateReadingTime(htmlContent: string = '') {
@@ -123,59 +123,60 @@ export default function ExplorePage() {
         <div className="flex-1 flex justify-center px-4 py-8 md:px-8 min-w-0">
           <main className="flex-1 max-w-[1100px] w-full min-w-0 min-h-[calc(100vh-61px)] flex flex-col">
             
-            {/* Header & Search Area */}
-            <div className="mb-10 space-y-8">
-              <div className="flex items-center gap-3 text-on-surface">
-                <div className="p-3 bg-primary/10 rounded-2xl">
-                  <Compass className="size-8 text-primary" />
-                </div>
-                <div>
-                  <h1 className="font-display-xl text-3xl font-black tracking-tight">Explore</h1>
-                  <p className="text-sm font-label-caps text-on-surface-variant tracking-wider uppercase mt-1">Discover new narratives</p>
-                </div>
+            {/* Redesigned Hero & Search Area */}
+            <div className="mb-12 flex flex-col items-center text-center mt-4">
+              <div className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-full mb-6">
+                <Compass className="size-10 text-primary animate-[spin_10s_linear_infinite]" />
               </div>
+              <h1 className="font-display-xl text-4xl md:text-6xl font-black tracking-tight mb-4 text-on-surface">
+                Discover Your Next Read
+              </h1>
+              <p className="font-body-md text-base md:text-lg text-on-surface-variant max-w-2xl mb-10">
+                Dive into thousands of stories, technical tutorials, and creative narratives shared by top creators.
+              </p>
 
-              {/* Large Search Input */}
-              <div className="relative max-w-2xl w-full">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 size-5 text-on-surface-variant/70" />
+              {/* Massive Search Input */}
+              <div className="relative max-w-3xl w-full group">
+                <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-xl group-hover:bg-primary/10 transition-colors duration-500 pointer-events-none" />
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 size-6 text-on-surface-variant/60 group-focus-within:text-primary transition-colors z-10" />
                 <input 
                   type="text"
-                  placeholder="Search articles, topics, or authors..."
+                  placeholder="What do you want to learn today?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-surface-container border border-outline-variant/40 rounded-full py-4 pl-14 pr-12 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all shadow-xs text-base"
+                  className="relative w-full bg-surface-container-lowest border-2 border-outline-variant/50 rounded-2xl py-5 pl-16 pr-14 text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all shadow-md text-lg md:text-xl z-0"
                 />
                 {searchQuery && (
                   <button 
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 p-1 text-on-surface-variant hover:text-on-surface transition-colors"
+                    className="absolute right-6 top-1/2 -translate-y-1/2 p-2 text-on-surface-variant hover:bg-surface-container rounded-full hover:text-on-surface transition-all z-10"
                   >
-                    <X className="size-4" />
+                    <X className="size-5" />
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Categories Horizontal Scroll */}
-            <div className="mb-8 overflow-x-auto no-scrollbar scroll-smooth flex gap-3 pb-2">
+            {/* Redesigned Categories Tabs */}
+            <div className="mb-10 w-full overflow-x-auto no-scrollbar scroll-smooth flex justify-start md:justify-center gap-2 pb-2">
               <button
                 onClick={() => setSelectedCategory(null)}
-                className={`px-5 py-2.5 rounded-full font-label-caps text-xs font-bold tracking-wider uppercase whitespace-nowrap transition-all active:scale-95 border ${
+                className={`px-6 py-3 rounded-xl font-label-caps text-xs font-bold tracking-widest uppercase whitespace-nowrap transition-all duration-300 ${
                   selectedCategory === null
-                    ? 'bg-primary text-on-primary border-primary shadow-md'
-                    : 'bg-surface-container-low text-on-surface-variant border-outline-variant/30 hover:bg-surface-container hover:text-on-surface'
+                    ? 'bg-on-surface text-surface shadow-xl -translate-y-0.5'
+                    : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
                 }`}
               >
-                All Topics
+                Everything
               </button>
               {categories.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-5 py-2.5 rounded-full font-label-caps text-xs font-bold tracking-wider uppercase whitespace-nowrap transition-all active:scale-95 border ${
+                  className={`px-6 py-3 rounded-xl font-label-caps text-xs font-bold tracking-widest uppercase whitespace-nowrap transition-all duration-300 ${
                     selectedCategory === cat
-                      ? 'bg-primary text-on-primary border-primary shadow-md'
-                      : 'bg-surface-container-low text-on-surface-variant border-outline-variant/30 hover:bg-surface-container hover:text-on-surface'
+                      ? 'bg-on-surface text-surface shadow-xl -translate-y-0.5'
+                      : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
                   }`}
                 >
                   {cat}

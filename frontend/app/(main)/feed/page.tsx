@@ -14,7 +14,7 @@ import RightSidebar from '@/components/layout/RightSidebar';
 import { useAuth } from '@/lib/auth-context';
 import { ListingSkeleton } from '@/components/ui/skeleton';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
 // ─── Feed Page ─────────────────────────────────────────────────────────────
 function FeedContent() {
@@ -162,8 +162,6 @@ function FeedContent() {
               categories={categories}
               activeTab={activeTab}
               onTabChange={setActiveTab}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
             />
 
             {/* Search Banner */}
@@ -174,7 +172,7 @@ function FeedContent() {
                 className="flex items-center justify-between px-4 py-3 rounded-xl bg-primary/10 border border-primary/20"
               >
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-primary/70">
+                  <span className="text-xs font-mono uppercase tracking-widest text-primary/70">
                     Search Results
                   </span>
                   <p className="text-sm font-semibold text-on-surface mt-0.5">

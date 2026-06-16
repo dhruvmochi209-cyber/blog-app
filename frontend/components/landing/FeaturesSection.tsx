@@ -19,7 +19,7 @@ export function FeaturesSection() {
             A platform tailored for technical content
           </h2>
           <p className="font-body-md text-secondary leading-relaxed">
-            Publishing software architectural logs should not feel like writing generic blog posts. DevLog is built to render high-fidelity engineering code and layouts.
+            Publishing software architectural logs should not feel like writing generic blog posts. CodeNexus is built to render high-fidelity engineering code and layouts.
           </p>
         </div>
 

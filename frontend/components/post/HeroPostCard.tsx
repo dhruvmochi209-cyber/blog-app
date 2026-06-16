@@ -50,7 +50,7 @@ export function HeroPostCard({ post, isBookmarked, onBookmarkToggle }: HeroPostC
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             alt="Featured Post"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-gray-900/10" />
         </div>
       ) : (
         <div className="aspect-[21/9] w-full bg-surface-container-high flex items-center justify-center">
@@ -59,25 +59,25 @@ export function HeroPostCard({ post, isBookmarked, onBookmarkToggle }: HeroPostC
       )}
 
       {/* Hero content overlay */}
-      <div className={`${post.coverImage ? 'absolute bottom-0 left-0 w-full' : ''} p-6`}>
+      <div className={`${post.coverImage ? 'absolute bottom-0 left-0 w-full' : ''} p-6 md:p-8 z-10`}>
         <div className="flex gap-3 mb-3">
           {post.category && (
-            <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-mono backdrop-blur-md border border-primary/20 uppercase tracking-widest">
+            <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold tracking-widest uppercase ${post.coverImage ? 'bg-primary text-white' : 'bg-primary/20 text-primary border border-primary/20'}`}>
               {post.category}
             </span>
           )}
-          <span className="text-on-surface-variant/80 text-xs font-mono flex items-center gap-1">
+          <span className={`text-xs font-mono flex items-center gap-1 font-medium ${post.coverImage ? 'text-white/90' : 'text-on-surface-variant/80'}`}>
             <Clock className="size-3" />
             {calculateReadingTime(post.htmlContent)} MIN READ
           </span>
         </div>
 
-        <h1 className="font-headline-md text-2xl md:text-3xl font-bold text-white mb-3 group-hover:text-primary transition-colors leading-snug line-clamp-2">
+        <h1 className={`font-headline-md text-2xl md:text-3xl lg:text-4xl font-black mb-3 transition-colors leading-snug line-clamp-2 ${post.coverImage ? 'text-white group-hover:text-primary-100' : 'text-on-surface group-hover:text-primary'}`}>
           {post.title}
         </h1>
 
         {post.excerpt && (
-          <p className="text-on-surface-variant text-sm line-clamp-2 max-w-2xl mb-5">
+          <p className={`text-sm md:text-base line-clamp-2 max-w-2xl mb-6 leading-relaxed ${post.coverImage ? 'text-white/80' : 'text-on-surface-variant'}`}>
             {post.excerpt}
           </p>
         )}
@@ -87,24 +87,24 @@ export function HeroPostCard({ post, isBookmarked, onBookmarkToggle }: HeroPostC
             <Link
               href={`/profile/${author._id || ''}`}
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-2 group/author"
+              className="flex items-center gap-3 group/author"
             >
               {author.avatar ? (
                 <img
                   src={author.avatar}
-                  className="w-8 h-8 rounded-full object-cover border border-white/10"
+                  className={`w-9 h-9 rounded-full object-cover border-2 ${post.coverImage ? 'border-white/20' : 'border-outline-variant'}`}
                   alt={author.name || 'Author'}
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-sm">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm ${post.coverImage ? 'bg-white/20 text-white' : 'bg-primary/15 text-primary'}`}>
                   {getAvatarFallback(author.name)}
                 </div>
               )}
               <div>
-                <div className="text-sm font-semibold text-on-surface group-hover/author:text-primary transition-colors">
+                <div className={`text-sm font-bold transition-colors ${post.coverImage ? 'text-white group-hover/author:text-primary-100' : 'text-on-surface group-hover/author:text-primary'}`}>
                   {author.name || 'Anonymous'}
                 </div>
-                <div className="text-xs text-on-surface-variant">{formatDate(post.createdAt)}</div>
+                <div className={`text-xs ${post.coverImage ? 'text-white/60' : 'text-on-surface-variant'}`}>{formatDate(post.createdAt)}</div>
               </div>
             </Link>
           </div>
@@ -114,9 +114,9 @@ export function HeroPostCard({ post, isBookmarked, onBookmarkToggle }: HeroPostC
               e.stopPropagation();
               onBookmarkToggle(post._id);
             }}
-            className="p-2 hover:text-primary hover:bg-white/10 rounded-full transition-all duration-200 cursor-pointer text-on-surface-variant/70 bg-transparent border-0"
+            className={`p-2.5 rounded-full transition-all duration-200 cursor-pointer border-0 ${post.coverImage ? 'text-white/80 hover:text-white hover:bg-white/20' : 'text-on-surface-variant/70 hover:text-primary hover:bg-surface-variant'}`}
           >
-            <Bookmark className="size-4" fill={isBookmarked ? 'currentColor' : 'none'} />
+            <Bookmark className="size-4.5" fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
         </div>
       </div>

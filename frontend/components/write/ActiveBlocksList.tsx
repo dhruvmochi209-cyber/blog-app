@@ -96,7 +96,7 @@ export function ActiveBlocksList({
           blockContent = (
             <div className="space-y-2">
               <Select value={category} onValueChange={(v) => { setCategory(v ?? ''); if (errors.category) setErrors((prev: any) => ({ ...prev, category: '' })); }}>
-                <SelectTrigger id="input-category" className="bg-surface-container-lowest border-outline-variant/40 font-body-md focus:border-primary focus:ring-1 focus:ring-primary h-11 rounded-lg">
+                <SelectTrigger id="input-category" className="bg-surface-container-lowest border-outline/50 font-body-md focus:border-primary focus:ring-1 focus:ring-primary h-11 rounded-lg">
                   <SelectValue placeholder="Choose a technical category for this post" />
                 </SelectTrigger>
                 <SelectContent>
@@ -119,14 +119,14 @@ export function ActiveBlocksList({
                   value={coverImage}
                   onChange={(e) => { setCoverImage(e.target.value); if (errors.coverImage) setErrors((prev: any) => ({ ...prev, coverImage: '' })); }}
                   placeholder="Paste a direct image URL (e.g. from Unsplash)..."
-                  className="bg-surface-container-lowest border-outline-variant/40 font-body-md pr-10 h-11 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="bg-surface-container-lowest border-outline/50 font-body-md pr-10 h-11 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary"
                 />
                 <ImageIcon className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant size-4.5" />
               </div>
               {errors.coverImage && <p className="text-error text-xs font-medium">{errors.coverImage}</p>}
 
               {/* Live aspect ratio preview */}
-              <div className="aspect-video rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container flex items-center justify-center relative group">
+              <div className="aspect-video rounded-xl overflow-hidden border border-outline/40 bg-surface-container flex items-center justify-center relative group">
                 {coverImage ? (
                   <img
                     src={coverImage}
@@ -138,9 +138,9 @@ export function ActiveBlocksList({
                     }}
                   />
                 ) : (
-                  <div className="p-4 text-on-surface-variant/40 flex flex-col items-center gap-1.5 select-none">
-                    <ImagePlus className="size-8 text-outline-variant/60" />
-                    <span className="text-[11px] font-semibold uppercase tracking-wider">Live cover preview container</span>
+                  <div className="p-4 text-on-surface-variant/70 flex flex-col items-center gap-1.5 select-none">
+                    <ImagePlus className="size-8 text-on-surface-variant/50" />
+                    <span className="text-sm font-semibold uppercase tracking-wider">Live cover preview container</span>
                   </div>
                 )}
               </div>
@@ -156,7 +156,7 @@ export function ActiveBlocksList({
                 value={excerpt}
                 onChange={(e) => { setExcerpt(e.target.value); if (errors.excerpt) setErrors((prev: any) => ({ ...prev, excerpt: '' })); }}
                 placeholder="Provide a concise summary description that will populate the post's SEO meta tags..."
-                className="bg-surface-container-lowest border-outline-variant/40 font-body-md resize-none rounded-lg focus:border-primary focus:ring-1 focus:ring-primary p-3"
+                className="bg-surface-container-lowest border-outline/50 font-body-md resize-none rounded-lg focus:border-primary focus:ring-1 focus:ring-primary p-3"
                 rows={3}
                 maxLength={300}
               />
@@ -202,20 +202,20 @@ export function ActiveBlocksList({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-            className="relative group/block border border-outline-variant/25 hover:border-outline-variant/50 rounded-xl p-5 transition-all duration-300 bg-surface-container-low/40 hover:bg-surface-container-low shadow-xs"
+            className="relative group/block rounded-2xl p-6 transition-all duration-300 bg-surface-container-lowest shadow-sm border border-outline-variant/40 hover:border-primary/40 hover:shadow-[0_8px_30px_-4px_rgba(79,70,229,0.15)]"
           >
             {/* Block Header Toolbar */}
-            <div className="flex items-center justify-between mb-4 pb-2 border-b border-outline-variant/15 opacity-70 group-hover/block:opacity-100 transition-opacity select-none">
-              <span className="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant flex items-center gap-1.5 font-bold">
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-outline-variant/20 opacity-80 group-hover/block:opacity-100 transition-opacity select-none">
+              <span className="font-label-caps text-[11px] uppercase tracking-[0.2em] text-primary flex items-center gap-2 font-black">
                 {blockIcon}
                 {blockLabel}
               </span>
               <button
                 onClick={() => deleteBlock(block)}
-                className="p-1 hover:bg-surface-container rounded-full text-on-surface-variant hover:text-error transition-all opacity-0 group-hover/block:opacity-100 active:scale-90 cursor-pointer flex items-center justify-center"
+                className="p-1.5 hover:bg-error/10 rounded-full text-on-surface-variant hover:text-error transition-all opacity-0 group-hover/block:opacity-100 active:scale-90 cursor-pointer flex items-center justify-center"
                 title={`Delete ${blockLabel} block`}
               >
-                <X className="size-4" />
+                <X className="size-[18px]" />
               </button>
             </div>
 

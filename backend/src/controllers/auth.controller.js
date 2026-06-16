@@ -91,7 +91,7 @@ export const initRegister = async (req, res) => {
       sentAt: new Date(),
       expiresAt,
     },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   // Send the email (or log to console if SMTP not configured)

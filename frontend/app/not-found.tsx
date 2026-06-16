@@ -28,7 +28,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container relative transition-colors duration-300">
       {/* hoisted document metadata */}
-      <title>404: Page Unresolved // DevLog</title>
+      <title>404: Page Unresolved // CodeNexus</title>
       <meta name="description" content="The requested path is not registered in our index. It may have been edited, archived, or is yet to be drafted." />
 
       {/* Decorative Grid Mesh Background */}
@@ -47,7 +47,7 @@ export default function NotFound() {
       <header className="relative z-10 flex justify-between items-center w-full px-6 py-6 max-w-[1280px] mx-auto border-b border-outline-variant/30">
         <div className="flex items-center gap-8">
           <Link href="/" id="notfound-header-logo" className="font-headline-md text-2xl font-bold text-on-surface hover:opacity-85 transition-opacity">
-            DevLog
+            CodeNexus
           </Link>
         </div>
         <div className="flex items-center gap-3">

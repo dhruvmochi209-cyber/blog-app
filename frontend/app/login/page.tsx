@@ -21,8 +21,8 @@ import { useAuth } from '@/lib/auth-context';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { SocialLoginSection } from '@/components/auth/SocialLoginSection';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
-const BACKEND = 'http://localhost:5001';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
+const BACKEND = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '') : 'http://localhost:5001';
 
 // ─── OTP Segmented Input Component ───────────────────────────────────────────
 interface OtpInputProps {
@@ -60,7 +60,7 @@ function OtpInput({ value, onChange }: OtpInputProps) {
           value={d === ' ' ? '' : d}
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
-          className="w-11 h-14 text-center font-mono text-xl font-bold bg-surface-container-lowest/50 border border-white/10 rounded-lg text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all caret-primary"
+          className="w-11 h-14 text-center font-mono text-xl font-bold bg-[#f3f4f6] border border-transparent rounded-lg text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all caret-indigo-500"
         />
       ))}
     </div>
@@ -203,7 +203,7 @@ export default function LoginPage() {
   return (
     <AuthLayout
       title="Sign In"
-      description="Sign in to your DevLog account to read and publish technical narratives."
+      description="Sign in to your CodeNexus account to read and publish technical narratives."
       brandTagline="Secure Authentication"
     >
       <AnimatePresence mode="wait">
@@ -217,35 +217,25 @@ export default function LoginPage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                {/* Header */}
-                <header className="mb-6">
-                  <h1 className="font-headline-md text-2xl font-bold text-on-surface mb-1.5">
-                    Welcome Back, Architect.
-                  </h1>
-                  <p className="font-body-md text-sm text-on-surface-variant">
-                    Log in to manage your stories and track your precision flow.
-                  </p>
-                </header>
 
-                <SocialLoginSection backendUrl={BACKEND} />
 
                 {/* Email/Password Form */}
                 <form onSubmit={handleLogin} className="space-y-4">
                   {/* Email */}
                   <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="email">
+                    <label className="font-mono text-xs text-gray-500 block uppercase tracking-widest" htmlFor="email">
                       EMAIL ADDRESS
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-[18px] pointer-events-none" />
                       <input
                         id="email"
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="architect@devlog.io"
-                        className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                        placeholder="architect@codenexus.io"
+                        className="w-full pl-10 pr-4 py-3 bg-[#f3f4f6] border border-transparent rounded-lg font-body-md text-sm text-gray-900 placeholder:text-gray-500/30 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -253,7 +243,7 @@ export default function LoginPage() {
                   {/* Password */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="password">
+                      <label className="font-mono text-xs text-gray-500 block uppercase tracking-widest" htmlFor="password">
                         PASSWORD
                       </label>
                       <button
@@ -263,13 +253,13 @@ export default function LoginPage() {
                           setForgotError('');
                           setForgotSuccess('');
                         }}
-                        className="font-mono text-[10px] text-primary hover:underline uppercase tracking-widest cursor-pointer bg-transparent border-0 outline-none"
+                        className="font-mono text-xs text-indigo-600 hover:underline uppercase tracking-widest cursor-pointer bg-transparent border-0 outline-none"
                       >
                         FORGOT PASSWORD?
                       </button>
                     </div>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-[18px] pointer-events-none" />
                       <input
                         id="password"
                         type={showPassword ? 'text' : 'password'}
@@ -277,12 +267,12 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-10 pr-11 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                        className="w-full pl-10 pr-11 py-3 bg-[#f3f4f6] border border-transparent rounded-lg font-body-md text-sm text-gray-900 placeholder:text-gray-500/30 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
                       </button>
@@ -291,7 +281,7 @@ export default function LoginPage() {
 
                   {/* Error */}
                   {error && (
-                    <div className="bg-error-container/30 text-on-error-container px-4 py-3 rounded-lg text-xs font-semibold border border-error/20 flex items-start gap-2">
+                    <div className="bg-red-500/20 text-red-700 px-4 py-3 rounded-lg text-xs font-semibold border border-red-500/30 flex items-start gap-2">
                       <AlertTriangle className="size-4 shrink-0 mt-0.5" />
                       <span>{error}</span>
                     </div>
@@ -300,27 +290,22 @@ export default function LoginPage() {
                   {/* Submit */}
                   <button
                     type="submit"
-                    id="login-submit-btn"
                     disabled={submitting}
-                    className="w-full mt-2 py-4 px-6 bg-primary text-on-primary font-headline-md text-base font-bold rounded-lg shadow-lg shadow-primary/10 hover:shadow-primary/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
+                    className="w-full mt-2 py-4 px-6 bg-[#4f46e5] text-gray-900 font-headline-md text-base font-bold rounded-lg shadow-sm hover:brightness-110 transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
                   >
                     {submitting ? (
                       <><Loader2 className="animate-spin size-4" /> Authenticating...</>
                     ) : (
-                      <>Sign In <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" /></>
+                      <>Signin</>
                     )}
                   </button>
                 </form>
 
-                {/* Sign Up link */}
-                <footer className="mt-6 text-center">
-                  <p className="font-body-md text-sm text-on-surface-variant">
-                    Don't have an account?{' '}
-                    <Link href="/register" className="text-primary font-semibold hover:underline decoration-primary/30 underline-offset-4 transition-all">
-                      Sign Up
-                    </Link>
-                  </p>
-                </footer>
+                {/* Social Login */}
+                <div className="mt-8 text-center text-sm text-gray-500">
+
+                  <SocialLoginSection backendUrl={BACKEND} />
+                </div>
               </motion.div>
             )}
 
@@ -334,32 +319,32 @@ export default function LoginPage() {
                 transition={{ duration: 0.2 }}
               >
                 <header className="mb-6 text-center">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary mb-4">
+                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 border border-transparent flex items-center justify-center mx-auto text-indigo-600 mb-4">
                     <Key className="size-5" />
                   </div>
-                  <h1 className="font-headline-md text-2xl font-bold text-on-surface mb-1.5">Reset Password</h1>
-                  <p className="font-body-md text-sm text-on-surface-variant">Enter your email to request a secure 6-digit recovery code.</p>
+                  <h1 className="font-headline-md text-2xl font-bold text-gray-900 mb-1.5">Reset Password</h1>
+                  <p className="font-body-md text-sm text-gray-500">Enter your email to request a secure 6-digit recovery code.</p>
                 </header>
 
                 <form onSubmit={handleSendOtp} className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="forgot-email">EMAIL ADDRESS</label>
+                    <label className="font-mono text-xs text-gray-500 block uppercase tracking-widest" htmlFor="forgot-email">EMAIL ADDRESS</label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-[18px] pointer-events-none" />
                       <input
                         id="forgot-email"
                         type="email"
                         required
                         value={forgotEmail}
                         onChange={(e) => setForgotEmail(e.target.value)}
-                        placeholder="architect@devlog.io"
-                        className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                        placeholder="architect@codenexus.io"
+                        className="w-full pl-10 pr-4 py-3 bg-[#f3f4f6] border border-transparent rounded-lg font-body-md text-sm text-gray-900 placeholder:text-gray-500/30 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all"
                       />
                     </div>
                   </div>
 
                   {forgotError && (
-                    <div className="bg-error-container/30 text-on-error-container px-4 py-3 rounded-lg text-xs font-semibold border border-error/20 flex items-start gap-2">
+                    <div className="bg-red-500/20 text-red-200 px-4 py-3 rounded-lg text-xs font-semibold border border-red-500/30 flex items-start gap-2">
                       <AlertTriangle className="size-4 shrink-0 mt-0.5" />
                       <span>{forgotError}</span>
                     </div>
@@ -368,7 +353,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={forgotSubmitting}
-                    className="w-full py-4 px-6 bg-primary text-on-primary font-headline-md text-base font-bold rounded-lg shadow-lg shadow-primary/10 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-4 px-6 bg-indigo-600 text-gray-900 font-headline-md text-base font-bold rounded-lg shadow-lg shadow-indigo-500/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {forgotSubmitting && <Loader2 className="animate-spin size-4" />}
                     Send Verification Code
@@ -379,7 +364,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={resetRecoveryWizard}
-                    className="font-mono text-[10px] text-primary hover:underline uppercase tracking-widest cursor-pointer bg-transparent border-0 outline-none"
+                    className="font-mono text-xs text-indigo-600 hover:underline uppercase tracking-widest cursor-pointer bg-transparent border-0 outline-none"
                   >
                     Back to Sign In
                   </button>
@@ -397,17 +382,17 @@ export default function LoginPage() {
                 transition={{ duration: 0.2 }}
               >
                 <header className="mb-6 text-center">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary mb-4 animate-bounce">
+                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 border border-transparent flex items-center justify-center mx-auto text-indigo-600 mb-4 animate-bounce">
                     <Mail className="size-5" />
                   </div>
-                  <h1 className="font-headline-md text-2xl font-bold text-on-surface mb-1.5">Check Your Email</h1>
-                  <p className="font-body-md text-sm text-on-surface-variant mb-3">We sent a 6-digit recovery code to:</p>
-                  <div className="text-xs bg-surface-container px-3.5 py-1.5 rounded-full inline-block text-on-surface-variant font-bold border border-white/10">
-                    <span className="text-on-surface font-semibold">{forgotEmail}</span>{' '}
+                  <h1 className="font-headline-md text-2xl font-bold text-gray-900 mb-1.5">Check Your Email</h1>
+                  <p className="font-body-md text-sm text-gray-500 mb-3">We sent a 6-digit recovery code to:</p>
+                  <div className="text-xs bg-white/10 px-3.5 py-1.5 rounded-full inline-block text-gray-500 font-bold border border-transparent">
+                    <span className="text-gray-900 font-semibold">{forgotEmail}</span>{' '}
                     <button
                       type="button"
                       onClick={() => { setForgotStep('email'); setForgotOtp(''); setForgotSuccess(''); setForgotError(''); }}
-                      className="text-primary hover:underline ml-1 cursor-pointer bg-transparent border-0 outline-none font-black"
+                      className="text-indigo-600 hover:underline ml-1 cursor-pointer bg-transparent border-0 outline-none font-black"
                     >
                       (Change)
                     </button>
@@ -416,12 +401,12 @@ export default function LoginPage() {
 
                 <form onSubmit={handleResetPassword} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="font-mono text-[10px] text-on-surface-variant block text-center uppercase tracking-widest">Enter 6-Digit Code</label>
+                    <label className="font-mono text-xs text-gray-500 block text-center uppercase tracking-widest">Enter 6-Digit Code</label>
                     <OtpInput value={forgotOtp} onChange={setForgotOtp} />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="new-password">New Password</label>
+                    <label className="font-mono text-xs text-gray-500 block uppercase tracking-widest" htmlFor="new-password">New Password</label>
                     <input
                       id="new-password"
                       type="password"
@@ -429,12 +414,12 @@ export default function LoginPage() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full px-4 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                      className="w-full px-4 py-3 bg-[#f3f4f6] border border-transparent rounded-lg font-body-md text-sm text-gray-900 placeholder:text-gray-500/30 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="confirm-new-password">Confirm New Password</label>
+                    <label className="font-mono text-xs text-gray-500 block uppercase tracking-widest" htmlFor="confirm-new-password">Confirm New Password</label>
                     <input
                       id="confirm-new-password"
                       type="password"
@@ -442,13 +427,13 @@ export default function LoginPage() {
                       value={confirmNewPassword}
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full px-4 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                      className="w-full px-4 py-3 bg-[#f3f4f6] border border-transparent rounded-lg font-body-md text-sm text-gray-900 placeholder:text-gray-500/30 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all"
                     />
                   </div>
 
                   {/* Security checklist */}
-                  <div className="bg-surface-container/60 border border-white/5 rounded-lg p-4 space-y-2">
-                    <p className="font-mono text-[9px] font-bold text-on-surface-variant/80 tracking-widest uppercase mb-1">Security Checklist</p>
+                  <div className="bg-[#f3f4f6] border border-white/5 rounded-lg p-4 space-y-2">
+                    <p className="font-mono text-sm font-bold text-gray-500/80 tracking-widest uppercase mb-1">Security Checklist</p>
                     {[
                       { pass: hasMinLength, label: 'At least 8 characters' },
                       { pass: hasUppercase, label: 'One uppercase letter' },
@@ -457,21 +442,21 @@ export default function LoginPage() {
                       { pass: passwordsMatch, label: 'Passwords match', divider: true },
                     ].map(({ pass, label, divider }) => (
                       <div key={label} className={`flex items-center gap-2 text-xs font-semibold ${divider ? 'border-t border-white/5 pt-2 mt-2' : ''}`}>
-                        <span className={`size-4 rounded-full flex items-center justify-center ${pass ? 'text-primary' : 'text-on-surface-variant/40'}`}>
+                        <span className={`size-4 rounded-full flex items-center justify-center ${pass ? 'text-indigo-600' : 'text-gray-500/40'}`}>
                           {pass ? <Check className="size-3.5" /> : <div className="w-1.5 h-1.5 rounded-full bg-current" />}
                         </span>
-                        <span className={pass ? 'text-on-surface' : 'text-on-surface-variant/70 font-light'}>{label}</span>
+                        <span className={pass ? 'text-gray-900' : 'text-gray-500/70 font-light'}>{label}</span>
                       </div>
                     ))}
                   </div>
 
                   {forgotSuccess && (
-                    <div className="bg-primary/10 text-primary px-4 py-3 rounded-lg text-xs font-semibold border border-primary/20 text-center">
+                    <div className="bg-indigo-500/20 text-indigo-600 px-4 py-3 rounded-lg text-xs font-semibold border border-transparent text-center">
                       {forgotSuccess}
                     </div>
                   )}
                   {forgotError && (
-                    <div className="bg-error-container/30 text-on-error-container px-4 py-3 rounded-lg text-xs font-semibold border border-error/20 text-center">
+                    <div className="bg-red-500/20 text-red-200 px-4 py-3 rounded-lg text-xs font-semibold border border-red-500/30 text-center">
                       {forgotError}
                     </div>
                   )}
@@ -479,7 +464,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={forgotSubmitting || !isResetSubmitEnabled}
-                    className="w-full py-4 px-6 bg-primary text-on-primary font-headline-md text-base font-bold rounded-lg shadow-lg shadow-primary/10 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-4 px-6 bg-indigo-600 text-gray-900 font-headline-md text-base font-bold rounded-lg shadow-lg shadow-indigo-500/20 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {forgotSubmitting && <Loader2 className="animate-spin size-4" />}
                     Reset Password
@@ -491,14 +476,14 @@ export default function LoginPage() {
                     type="button"
                     onClick={handleSendOtp as any}
                     disabled={forgotSubmitting}
-                    className="font-mono text-[10px] text-primary hover:underline uppercase tracking-widest cursor-pointer bg-transparent border-0 outline-none disabled:opacity-50"
+                    className="font-mono text-xs text-indigo-600 hover:underline uppercase tracking-widest cursor-pointer bg-transparent border-0 outline-none disabled:opacity-50"
                   >
                     Resend Verification Code
                   </button>
                   <button
                     type="button"
                     onClick={resetRecoveryWizard}
-                    className="text-on-surface-variant hover:text-on-surface text-xs cursor-pointer bg-transparent border-0 outline-none"
+                    className="text-gray-500 hover:text-gray-900 text-xs cursor-pointer bg-transparent border-0 outline-none"
                   >
                     Back to Sign In
                   </button>
@@ -516,22 +501,22 @@ export default function LoginPage() {
                 transition={{ duration: 0.2 }}
                 className="text-center space-y-5 py-6 select-none"
               >
-                <div className="w-16 h-16 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center mx-auto text-primary animate-bounce">
+                <div className="w-16 h-16 bg-indigo-500/20 border border-transparent rounded-full flex items-center justify-center mx-auto text-indigo-600 animate-bounce">
                   <CheckCircle2 className="size-7" />
                 </div>
                 <div className="space-y-2">
-                  <h1 className="font-headline-md text-2xl font-bold text-on-surface">Password Updated</h1>
-                  <p className="font-body-md text-sm text-on-surface-variant max-w-xs mx-auto leading-relaxed">
+                  <h1 className="font-headline-md text-2xl font-bold text-gray-900">Password Updated</h1>
+                  <p className="font-body-md text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
                     Your new password has been successfully configured.
                   </p>
                 </div>
-                <div className="bg-primary/10 text-primary px-4 py-3 rounded-full text-xs font-bold uppercase tracking-wider border border-primary/20 max-w-xs mx-auto font-mono">
+                <div className="bg-indigo-500/20 text-indigo-600 px-4 py-3 rounded-full text-xs font-bold uppercase tracking-wider border border-transparent max-w-xs mx-auto font-mono">
                   Returning to Sign In in {countdown}s...
                 </div>
                 <button
                   type="button"
                   onClick={resetRecoveryWizard}
-                  className="font-mono text-[10px] uppercase tracking-widest text-primary hover:underline font-bold block mx-auto cursor-pointer bg-transparent border-0 mt-4 outline-none"
+                  className="font-mono text-xs uppercase tracking-widest text-indigo-600 hover:underline font-bold block mx-auto cursor-pointer bg-transparent border-0 mt-4 outline-none"
                 >
                   Sign In Immediately
                 </button>

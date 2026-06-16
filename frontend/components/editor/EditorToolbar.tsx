@@ -66,7 +66,7 @@ export function EditorToolbar({
               </button>
 
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all pointer-events-none z-50">
-                <div className="bg-inverse-surface text-inverse-on-surface font-label-caps text-[9px] font-bold tracking-wider px-2.5 py-1 rounded shadow-md whitespace-nowrap uppercase">
+                <div className="bg-inverse-surface text-inverse-on-surface font-label-caps text-sm font-bold tracking-wider px-2.5 py-1 rounded shadow-md whitespace-nowrap uppercase">
                   {opt.label} {isActive ? '(Added)' : ''}
                 </div>
               </div>

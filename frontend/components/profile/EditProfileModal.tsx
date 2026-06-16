@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Camera, Loader2, Check } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
 export function EditProfileModal({ isOpen, onClose, userProfile, onSuccess }: any) {
   const { accessToken } = useAuth();
@@ -131,7 +131,7 @@ export function EditProfileModal({ isOpen, onClose, userProfile, onSuccess }: an
                 className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none"
                 placeholder="Tell us a little about yourself..."
               />
-              <div className="text-right text-[10px] text-on-surface-variant mt-1 font-medium">
+              <div className="text-right text-xs text-on-surface-variant mt-1 font-medium">
                 {bio.length}/160
               </div>
             </div>

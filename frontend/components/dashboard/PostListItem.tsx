@@ -44,98 +44,91 @@ export function PostListItem({
   };
 
   return (
-    <tr
-      className={`hover:bg-surface-container-low/60 transition-all duration-300 ${
-        isTransitioning ? 'opacity-0 scale-98 select-none pointer-events-none' : ''
+    <div
+      className={`bg-surface-container-low border border-outline-variant/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 hover:border-outline-variant/60 hover:shadow-md transition-all duration-300 ${
+        isTransitioning ? 'opacity-0 scale-95 select-none pointer-events-none' : ''
       }`}
     >
-      {/* Title & Excerpt */}
-      <td className="px-6 py-4.5 min-w-[280px]">
-        <div className="flex flex-col gap-1">
+      {/* Left side: Title, Excerpt, Category, Time */}
+      <div className="flex-1 min-w-0 flex flex-col gap-2">
+        <div className="flex items-center gap-3">
           <Link
             href={`/feed/${post.slug}`}
-            className="font-headline-md text-[14.5px] font-bold text-on-surface line-clamp-1 hover:text-primary transition-colors leading-tight"
+            className="font-headline-md text-base sm:text-lg font-bold text-on-surface truncate hover:text-primary transition-colors"
           >
             {post.title}
           </Link>
-          <span className="font-body-md text-xs text-on-surface-variant line-clamp-1 font-light leading-normal">
-            {post.excerpt || 'No summary description provided.'}
+          <span className="shrink-0 px-2.5 py-0.5 bg-surface-container border border-outline-variant/30 text-on-surface text-xs rounded-md font-label-caps font-bold tracking-wider uppercase hidden sm:inline-block">
+            {post.category || 'Uncategorized'}
           </span>
         </div>
-      </td>
+        
+        <p className="font-body-md text-sm text-on-surface-variant line-clamp-1 font-light pr-4">
+          {post.excerpt || 'No summary description provided.'}
+        </p>
 
-      {/* Category */}
-      <td className="hidden sm:table-cell px-6 py-4.5 whitespace-nowrap">
-        <span className="px-2.5 py-0.5 bg-surface-container border border-outline-variant/30 text-on-surface text-[10px] rounded-full font-label-caps font-bold tracking-wider uppercase">
-          {post.category || 'Uncategorized'}
-        </span>
-      </td>
+        <div className="flex items-center gap-4 mt-1">
+          <span className="font-body-md text-sm font-semibold text-on-surface-variant flex items-center gap-1.5 uppercase tracking-widest">
+            <Eye className="size-3.5" />
+            {(post.views || 0).toLocaleString()} Views
+          </span>
+          <span className="w-1 h-1 rounded-full bg-outline-variant/50" />
+          <span className="font-body-md text-sm text-on-surface-variant/80 font-medium">
+            Updated {formatRelativeTime(post.updatedAt)}
+          </span>
+        </div>
+      </div>
 
-      {/* Views */}
-      <td className="hidden xs:table-cell px-6 py-4.5 whitespace-nowrap text-center">
-        <span className="font-body-md text-xs text-on-surface-variant font-semibold flex items-center justify-center gap-1.5">
-          <Eye className="size-3.5 text-secondary/60" />
-          {(post.views || 0).toLocaleString()}
-        </span>
-      </td>
-
-      {/* Last Updated */}
-      <td className="hidden md:table-cell px-6 py-4.5 whitespace-nowrap">
-        <span className="font-body-md text-xs text-on-surface-variant font-medium">
-          {formatRelativeTime(post.updatedAt)}
-        </span>
-      </td>
-
-      {/* Switch Status Button */}
-      <td className="px-6 py-4.5 whitespace-nowrap text-center">
-        <div className="flex items-center justify-center gap-2.5">
+      {/* Right side: Status toggle & Actions */}
+      <div className="flex items-center justify-between sm:justify-end gap-6 sm:w-[240px] shrink-0 border-t border-outline-variant/20 sm:border-t-0 pt-4 sm:pt-0">
+        
+        {/* Switch Status Button */}
+        <div className="flex items-center gap-3">
           <button
             onClick={() => onToggleStatus(post._id, post.status)}
             disabled={isToggling}
-            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-outline-variant/30 transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-60 select-none items-center ${
-              post.status === 'PUBLISHED' ? 'bg-primary' : 'bg-surface-container-high'
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-outline-variant/30 transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-60 select-none items-center ${
+              post.status === 'PUBLISHED' ? 'bg-primary border-primary' : 'bg-surface-container-high'
             }`}
             title={`Switch to ${post.status === 'PUBLISHED' ? 'Draft' : 'Publish'}`}
           >
             <span
-              className={`pointer-events-none relative inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out flex items-center justify-center ${
-                post.status === 'PUBLISHED' ? 'translate-x-4.5' : 'translate-x-0.5'
+              className={`pointer-events-none relative inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out flex items-center justify-center ${
+                post.status === 'PUBLISHED' ? 'translate-x-6' : 'translate-x-1'
               }`}
             >
               {isToggling && (
-                <Loader2 className="animate-spin text-primary size-2" />
+                <Loader2 className="animate-spin text-primary size-3" />
               )}
             </span>
           </button>
           <span
-            className={`font-label-caps text-[9px] uppercase font-bold tracking-wider select-none w-14 text-left ${
+            className={`font-label-caps text-xs uppercase font-bold tracking-wider select-none w-16 text-left ${
               post.status === 'PUBLISHED' ? 'text-primary' : 'text-on-surface-variant/80'
             }`}
           >
             {post.status}
           </span>
         </div>
-      </td>
 
-      {/* Actions */}
-      <td className="px-6 py-4.5 whitespace-nowrap text-center">
-        <div className="flex items-center justify-center gap-1">
+        {/* Actions */}
+        <div className="flex items-center gap-1.5">
           <Link
             href={`/edit/${post._id}`}
-            className="p-1.5 hover:bg-surface-container text-on-surface-variant hover:text-primary rounded-lg transition-colors cursor-pointer active:scale-90 flex items-center justify-center"
+            className="p-2 bg-surface-container hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded-xl transition-colors cursor-pointer active:scale-95 flex items-center justify-center border border-outline-variant/20"
             title="Edit publication"
           >
             <Edit className="size-4" />
           </Link>
           <button
             onClick={() => onDeleteClick(post)}
-            className="p-1.5 hover:bg-error-container/20 text-on-surface-variant hover:text-error rounded-lg transition-colors cursor-pointer active:scale-90 flex items-center justify-center"
+            className="p-2 bg-surface-container hover:bg-error-container/40 text-on-surface-variant hover:text-error rounded-xl transition-colors cursor-pointer active:scale-95 flex items-center justify-center border border-outline-variant/20"
             title="Delete publication"
           >
             <Trash2 className="size-4" />
           </button>
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 }

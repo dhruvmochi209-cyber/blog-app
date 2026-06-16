@@ -21,8 +21,8 @@ import { useAuth } from '@/lib/auth-context';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { SocialLoginSection } from '@/components/auth/SocialLoginSection';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
-const BACKEND = 'http://localhost:5001';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
+const BACKEND = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '') : 'http://localhost:5001';
 
 // ─── OTP Input ─────────────────────────────────────────────────────────────
 function OtpInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -55,7 +55,7 @@ function OtpInput({ value, onChange }: { value: string; onChange: (v: string) =>
           value={d === ' ' ? '' : d}
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
-          className="w-11 h-14 text-center font-mono text-xl font-bold bg-surface-container-lowest/50 border border-white/10 rounded-lg text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all caret-primary"
+          className="w-11 h-14 text-center font-mono text-xl font-bold bg-[#f3f4f6] border border-transparent rounded-lg text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all caret-indigo-500"
         />
       ))}
     </div>
@@ -175,7 +175,7 @@ export default function RegisterPage() {
   return (
     <AuthLayout
       title="Sign Up"
-      description="Create a DevLog account to read, draft, and publish technical publications."
+      description="Create a CodeNexus account to read, draft, and publish technical publications."
       brandTagline="Architect Registration"
     >
       <AnimatePresence mode="wait">
@@ -187,27 +187,17 @@ export default function RegisterPage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                {/* Header */}
-                <header className="mb-6 text-center md:text-left">
-                  <h1 className="font-headline-md text-2xl font-bold text-on-surface mb-1.5">
-                    Join the Conversation
-                  </h1>
-                  <p className="font-body-md text-sm text-on-surface-variant">
-                    Create an account to read, draft, and publish your insights.
-                  </p>
-                </header>
 
-                <SocialLoginSection backendUrl={BACKEND} />
 
                 {/* Email/Password Form */}
                 <form onSubmit={handleInitRegister} className="space-y-4">
                   {/* Full Name */}
                   <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="username">
+                    <label className="font-mono text-xs text-gray-500 block uppercase tracking-widest" htmlFor="username">
                       FULL NAME
                     </label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-[18px] pointer-events-none" />
                       <input
                         id="username"
                         type="text"
@@ -215,37 +205,37 @@ export default function RegisterPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Jon Snow"
-                        className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                        className="w-full pl-10 pr-4 py-3 bg-[#f3f4f6] border border-transparent rounded-lg font-body-md text-sm text-gray-900 placeholder:text-gray-500/30 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Email */}
                   <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="email">
+                    <label className="font-mono text-xs text-gray-500 block uppercase tracking-widest" htmlFor="email">
                       EMAIL ADDRESS
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-[18px] pointer-events-none" />
                       <input
                         id="email"
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="jon@devlog.com"
-                        className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                        placeholder="jon@codenexus.com"
+                        className="w-full pl-10 pr-4 py-3 bg-[#f3f4f6] border border-transparent rounded-lg font-body-md text-sm text-gray-900 placeholder:text-gray-500/30 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Password */}
                   <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-on-surface-variant block uppercase tracking-widest" htmlFor="password">
+                    <label className="font-mono text-xs text-gray-500 block uppercase tracking-widest" htmlFor="password">
                       PASSWORD
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-[18px] pointer-events-none" />
                       <input
                         id="password"
                         type={showPassword ? 'text' : 'password'}
@@ -253,12 +243,12 @@ export default function RegisterPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-10 pr-11 py-3 bg-surface-container-lowest/50 border border-white/10 rounded-lg font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                        className="w-full pl-10 pr-11 py-3 bg-[#f3f4f6] border border-transparent rounded-lg font-body-md text-sm text-gray-900 placeholder:text-gray-500/30 focus:ring-2 focus:ring-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none transition-all"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
                       </button>
@@ -267,7 +257,7 @@ export default function RegisterPage() {
 
                   {/* Errors */}
                   {errors.length > 0 && (
-                    <div className="bg-error-container/30 text-on-error-container px-4 py-3 rounded-lg text-xs font-semibold border border-error/20 space-y-1.5 flex flex-col items-start">
+                    <div className="bg-red-500/20 text-red-700 px-4 py-3 rounded-lg text-xs font-semibold border border-red-500/30 space-y-1.5 flex flex-col items-start">
                       {errors.map((e, i) => (
                         <div key={i} className="flex items-center gap-1.5">
                           <AlertTriangle className="size-3.5 shrink-0" />
@@ -281,25 +271,21 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full mt-2 py-4 px-6 bg-primary text-on-primary font-headline-md text-base font-bold rounded-lg shadow-lg shadow-primary/10 hover:shadow-primary/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
+                    className="w-full mt-2 py-4 px-6 bg-[#4f46e5] text-gray-900 font-headline-md text-base font-bold rounded-lg shadow-sm hover:brightness-110 transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
                   >
                     {submitting ? (
                       <><Loader2 className="animate-spin size-4" /> Processing...</>
                     ) : (
-                      <>Create Account <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" /></>
+                      <>Signup</>
                     )}
                   </button>
                 </form>
 
-                {/* Sign In link */}
-                <footer className="mt-6 text-center">
-                  <p className="font-body-md text-sm text-on-surface-variant">
-                    Already have an account?{' '}
-                    <Link href="/login" className="text-primary font-semibold hover:underline decoration-primary/30 underline-offset-4 transition-all">
-                      Sign In
-                    </Link>
-                  </p>
-                </footer>
+                {/* Social Login */}
+                <div className="mt-8 text-center text-sm text-gray-500">
+
+                  <SocialLoginSection backendUrl={BACKEND} />
+                </div>
               </motion.div>
             ) : (
               <motion.div
@@ -311,26 +297,26 @@ export default function RegisterPage() {
                 className="text-center"
               >
                 <header className="mb-6">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary mb-4 animate-bounce">
+                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 border border-transparent flex items-center justify-center mx-auto text-indigo-600 mb-4 animate-bounce">
                     <Mail className="size-5" />
                   </div>
-                  <h1 className="font-headline-md text-2xl font-bold text-on-surface mb-1.5">Check your email</h1>
-                  <p className="font-body-md text-sm text-on-surface-variant mb-3">
+                  <h1 className="font-headline-md text-2xl font-bold text-gray-900 mb-1.5">Check your email</h1>
+                  <p className="font-body-md text-sm text-gray-500 mb-3">
                     We sent a 6-digit verification code to:
                   </p>
-                  <div className="text-xs bg-surface-container px-3.5 py-1.5 rounded-full inline-block text-on-surface-variant font-bold border border-white/10">
-                    <span className="text-on-surface font-semibold">{pendingEmail}</span>
+                  <div className="text-xs bg-white/10 px-3.5 py-1.5 rounded-full inline-block text-gray-500 font-bold border border-transparent">
+                    <span className="text-gray-900 font-semibold">{pendingEmail}</span>
                   </div>
                 </header>
 
                 <form onSubmit={handleVerifyOtp} className="space-y-6">
                   <div className="space-y-2">
-                    <label className="font-mono text-[10px] text-on-surface-variant block text-center uppercase tracking-widest">Enter 6-Digit Code</label>
+                    <label className="font-mono text-xs text-gray-500 block text-center uppercase tracking-widest">Enter 6-Digit Code</label>
                     <OtpInput value={otp} onChange={setOtp} />
                   </div>
 
                   {errors.length > 0 && (
-                    <div className="bg-error-container/30 text-on-error-container px-4 py-3 rounded-lg text-xs font-semibold border border-error/20 text-center flex items-center justify-center gap-1.5">
+                    <div className="bg-red-500/20 text-red-200 px-4 py-3 rounded-lg text-xs font-semibold border border-red-500/30 text-center flex items-center justify-center gap-1.5">
                       <AlertTriangle className="size-4 shrink-0" />
                       <span>{errors[0]}</span>
                     </div>
@@ -339,21 +325,21 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={submitting || otp.length < 6}
-                    className="w-full py-4 px-6 bg-primary text-on-primary font-headline-md text-base font-bold rounded-lg shadow-lg shadow-primary/10 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-4 px-6 bg-indigo-600 text-gray-900 font-headline-md text-base font-bold rounded-lg shadow-lg shadow-indigo-500/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {submitting ? <><Loader2 className="animate-spin size-4" /> Verifying...</> : 'Verify & Complete'}
                   </button>
                 </form>
 
-                <div className="mt-8 text-center flex flex-col gap-3 pt-6 border-t border-white/10">
-                  <p className="font-body-md text-xs text-on-surface-variant font-medium">
+                <div className="mt-8 text-center flex flex-col gap-3 pt-6 border-t border-transparent">
+                  <p className="font-body-md text-xs text-gray-500 font-medium">
                     Didn't receive the email?{' '}
                     {resendCooldown > 0 ? (
                       <span className="font-bold">Resend in {resendCooldown}s</span>
                     ) : (
                       <button
                         onClick={handleResend}
-                        className="text-primary font-bold hover:underline bg-transparent border-0 cursor-pointer outline-none"
+                        className="text-indigo-600 font-bold hover:underline bg-transparent border-0 cursor-pointer outline-none"
                       >
                         Resend code
                       </button>
@@ -361,7 +347,7 @@ export default function RegisterPage() {
                   </p>
                   <button
                     onClick={() => { setStep('form'); setOtp(''); setErrors([]); }}
-                    className="font-mono text-[10px] text-on-surface-variant/80 hover:text-on-surface transition-colors cursor-pointer outline-none uppercase tracking-widest"
+                    className="font-mono text-xs text-gray-500/80 hover:text-gray-900 transition-colors cursor-pointer outline-none uppercase tracking-widest"
                   >
                     ← Change email address
                   </button>
