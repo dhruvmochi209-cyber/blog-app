@@ -10,6 +10,9 @@ import { globalErrorHandler } from './middleware/error.middleware.js';
 
 const app = express();
 
+// Required for rate-limiting behind a reverse proxy (Render, Vercel, Heroku)
+app.set('trust proxy', 1);
+
 // ─── Security Headers ─────────────────────────────────────────────────────────
 
 /**

@@ -1,6 +1,10 @@
 import 'dotenv/config'; // Load .env variables before anything else
+import dns from 'dns';
 import app from './src/app.js';
 import connectDB from './src/config/db.js';
+
+// Force Node to use IPv4 instead of IPv6. Fixes SMTP 'ENETUNREACH' error on Render/Alpine
+dns.setDefaultResultOrder('ipv4first');
 
 const PORT = process.env.PORT || 5001;
 console.log(process.env.GOOGLE_CLIENT_ID);
