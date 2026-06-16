@@ -66,53 +66,25 @@ const issueTokensAndRespond = (res, user, statusCode = 200) => {
 export const initRegister = async (req, res) => {
   const { name, email, password } = req.body;
 
-  // Check if a verified account already exists
+  // Check if account already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new AppError('An account with this email already exists.', 409);
   }
 
-  // Pre-hash the password so /verify doesn't need the plain-text password
+  // Hash the password
   const passwordHash = await User.hashPassword(password);
 
-  // Generate OTP
-  const otp = generateOTP();
-  const otpHash = await hashOTP(otp);
-  const expiresAt = getOTPExpiry();
-
-  // Upsert: overwrite any previous pending registration for this email
-  await OTPRecord.findOneAndUpdate(
-    { email },
-    {
-      name,
-      passwordHash,
-      otpHash,
-      attempts: 0,
-      sentAt: new Date(),
-      expiresAt,
-    },
-    { upsert: true, returnDocument: 'after' }
-  );
-
-  // Send the email (or log to console if SMTP not configured)
-  try {
-    await sendOTPEmail(email, name, otp);
-  } catch (err) {
-    await OTPRecord.deleteOne({ email }); // Cleanup
-    console.error('SMTP Error:', err.message);
-    throw new AppError(
-      'Failed to send verification code. Please check your backend SMTP credentials in .env',
-      500
-    );
-  }
-
-  const expiryMinutes = process.env.OTP_EXPIRY_MINUTES || '10';
-
-  res.status(200).json({
-    success: true,
-    message: `Verification code sent to ${email}. It expires in ${expiryMinutes} minutes.`,
-    email, // Return email so the frontend can pass it to step 2
+  // Create the verified user account directly
+  const user = await User.create({
+    name,
+    email,
+    passwordHash,
+    role: 'VISITOR',
   });
+
+  // Issue tokens and respond (201 Created)
+  issueTokensAndRespond(res, user, 201);
 };
 
 // ─── STEP 2: Verify OTP & Complete Registration ───────────────────────────────
