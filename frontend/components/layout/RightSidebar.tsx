@@ -33,7 +33,7 @@ export default function RightSidebar() {
   }, []);
 
   return (
-    <aside className="hidden lg:flex w-[340px] flex-shrink-0 flex-col pt-8 px-0 overflow-y-auto no-scrollbar sticky top-16 h-[calc(100vh-64px)]">
+    <aside className="hidden lg:flex flex-col sticky top-24 h-[calc(100vh-120px)] w-full">
 
       {/* Trending Stories Section */}
       <section className="rounded-3xl p-6 bg-white border border-slate-200 shadow-sm flex-1 flex flex-col mb-4 relative overflow-hidden">
