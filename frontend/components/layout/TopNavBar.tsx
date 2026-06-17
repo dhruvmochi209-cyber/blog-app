@@ -73,18 +73,18 @@ export default function TopNavBar() {
         </div>
 
         {/* Right: Search + Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-4">
           {/* Search trigger */}
-          <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-variant/50 transition-all">
-            <Search className="size-5 shrink-0" />
+          <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center gap-2 bg-[#f4f5f7] px-4 py-2 rounded-full border border-transparent hover:border-slate-200 transition-all focus-within:bg-white focus-within:border-slate-300 focus-within:shadow-sm">
+            <Search className="size-[18px] shrink-0 text-slate-500" strokeWidth={2.5} />
             <input
               value={searchVal}
               onChange={(e) => setSearchVal(e.target.value)}
-              className="bg-transparent border-none text-sm w-36 focus:outline-none text-on-surface placeholder:text-on-surface-variant/50"
+              className="bg-transparent border-none text-[15px] w-48 focus:outline-none text-slate-700 placeholder:text-slate-400 font-medium"
               placeholder="Search articles..."
               type="text"
             />
-            <kbd className="font-mono text-xs bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface-variant">⌘K</kbd>
+            <kbd className="font-sans text-[11px] font-semibold bg-[#e2e8f0] text-slate-500 px-1.5 py-0.5 rounded flex items-center justify-center tracking-widest ml-2">⌘K</kbd>
           </form>
 
           {/* Mobile search input toggle */}
@@ -92,41 +92,39 @@ export default function TopNavBar() {
             <input
               value={searchVal}
               onChange={(e) => setSearchVal(e.target.value)}
-              className="absolute right-0 w-0 focus:w-48 bg-surface-container px-3 py-1.5 rounded-full border border-outline-variant text-sm focus:outline-none transition-all duration-300 ease-in-out opacity-0 focus:opacity-100 z-20 text-on-surface"
+              className="absolute right-0 w-0 focus:w-48 bg-[#f4f5f7] px-3 py-2 rounded-full border border-transparent text-[15px] focus:outline-none transition-all duration-300 ease-in-out opacity-0 focus:opacity-100 z-20 text-slate-700"
               placeholder="Search..."
               type="text"
             />
-            <button type="button" onClick={(e) => { (e.currentTarget.previousElementSibling as HTMLInputElement)?.focus(); }} className="p-2 z-30 bg-surface text-on-surface-variant hover:text-primary rounded-full transition-colors cursor-pointer group-focus-within:bg-transparent">
+            <button type="button" onClick={(e) => { (e.currentTarget.previousElementSibling as HTMLInputElement)?.focus(); }} className="p-2 z-30 bg-surface text-slate-500 hover:text-slate-800 rounded-full transition-colors cursor-pointer group-focus-within:bg-transparent">
               <Search className="size-5" />
             </button>
           </form>
 
-          <div className="h-6 w-px bg-outline-variant hidden md:block" />
+          <div className="h-6 w-px bg-slate-200 hidden md:block" />
 
-          {/* Theme Toggle Removed */}
-
-          {/* Theme Toggle Removed */}
+          {/* Write Button */}
           {loading ? (
-             <div className="hidden sm:flex items-center gap-2 font-body-md text-sm text-on-surface-variant/50 cursor-default">
-               <Edit3 className="size-4 opacity-50" />
+             <div className="hidden sm:flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-400 cursor-default">
+               <Edit3 className="size-[18px] opacity-50" strokeWidth={2.5} />
                <span className="opacity-50">Write</span>
              </div>
           ) : user ? (
             <Link
               href="/write"
               id="topnavbar-write-btn"
-              className="hidden sm:flex items-center gap-2 font-body-md text-sm text-on-surface-variant hover:text-primary transition-colors active:scale-95"
+              className="hidden sm:flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors active:scale-95"
             >
-              <Edit3 className="size-4" />
+              <Edit3 className="size-[18px]" strokeWidth={2.5} />
               Write
             </Link>
           ) : (
             <Link
               href="/login"
               id="topnavbar-write-anonymous-btn"
-              className="hidden sm:flex items-center gap-2 font-body-md text-sm text-on-surface-variant hover:text-primary transition-colors"
+              className="hidden sm:flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
-              <Edit3 className="size-4" />
+              <Edit3 className="size-[18px]" strokeWidth={2.5} />
               Write
             </Link>
           )}
