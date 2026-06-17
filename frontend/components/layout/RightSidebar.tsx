@@ -70,6 +70,7 @@ export default function RightSidebar() {
                         src={post.authorId.avatar}
                         className="w-5 h-5 rounded-full object-cover border border-slate-200 shadow-sm"
                         alt={post.authorId.name || 'Author'}
+                        onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(post.authorId?.name || 'U')}&background=random`; }}
                       />
                     ) : (
                       <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px] border border-primary/20">

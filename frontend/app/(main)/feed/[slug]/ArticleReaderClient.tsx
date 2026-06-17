@@ -382,6 +382,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                               src={post.authorId.avatar}
                               className="w-10 h-10 rounded-full object-cover border border-outline-variant/20 group-hover/author:border-primary transition-colors"
                               alt={post.authorId.name || 'Author'}
+                              onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(post.authorId?.name || 'U')}&background=random`; }}
                             />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-primary/5 text-primary flex items-center justify-center font-bold text-sm border border-primary/10 group-hover/author:border-primary transition-colors select-none">

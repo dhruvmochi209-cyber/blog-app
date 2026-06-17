@@ -30,7 +30,7 @@ export function ProfileHeader({ profileUser, isOwner, onEditClick }: any) {
           <div className="relative z-10">
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-surface-container-lowest overflow-hidden bg-surface-container shadow-xl">
               {profileUser.avatar ? (
-                <img src={profileUser.avatar} alt={profileUser.name} className="w-full h-full object-cover" />
+                <img src={profileUser.avatar} alt={profileUser.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profileUser.name || 'U')}&background=random`; }} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-secondary text-white font-display-xl text-5xl font-black">
                   {profileUser.name.charAt(0).toUpperCase()}

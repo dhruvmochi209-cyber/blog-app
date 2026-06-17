@@ -98,7 +98,7 @@ export function PostGridCard({ post, isBookmarked, onBookmarkToggle, variant = '
         ) : (
           <Link href={`/profile/${author._id || ''}`} onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 mb-3 group/author w-fit">
             {author.avatar ? (
-              <img src={author.avatar} alt={author.name} className="w-6 h-6 rounded-full object-cover shadow-xs group-hover/author:border-primary border border-transparent transition-colors" />
+              <img src={author.avatar} alt={author.name} className="w-6 h-6 rounded-full object-cover shadow-xs group-hover/author:border-primary border border-transparent transition-colors" onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(author.name || 'U')}&background=random`; }} />
             ) : (
               <div className="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs group-hover/author:opacity-80 transition-opacity">
                 {getAvatarFallback(author.name)}
@@ -127,7 +127,7 @@ export function PostGridCard({ post, isBookmarked, onBookmarkToggle, variant = '
                 className="flex items-center gap-1.5 group/author"
               >
                 {author.avatar ? (
-                  <img src={author.avatar} className="w-5 h-5 rounded-full object-cover border border-white/10" alt={author.name} />
+                  <img src={author.avatar} className="w-5 h-5 rounded-full object-cover border border-white/10" alt={author.name} onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(author.name || 'U')}&background=random`; }} />
                 ) : (
                   <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
                     {getAvatarFallback(author.name)}

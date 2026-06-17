@@ -67,7 +67,7 @@ export function WritePreviewOverlay({
             <div className="flex items-center gap-3 mb-8 pb-6 border-b border-outline-variant/30">
               <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border border-outline-variant/30 select-none font-bold">
                 {user?.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=random`; }} />
                 ) : (
                   <span className="font-label-caps text-on-surface text-sm">{user?.name?.charAt(0).toUpperCase()}</span>
                 )}

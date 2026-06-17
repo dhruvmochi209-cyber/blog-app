@@ -68,7 +68,7 @@ export function RelatedStories({ relatedLoading, relatedPosts, calculateReadingT
               {/* Author metadata */}
               <div className="flex items-center gap-2.5 pt-4 mt-4 border-t border-outline-variant/20">
                 {rPost.authorId?.avatar ? (
-                  <img src={rPost.authorId.avatar} className="w-5.5 h-5.5 rounded-full object-cover border border-outline-variant/30" alt={rPost.authorId.name} />
+                  <img src={rPost.authorId.avatar} className="w-5.5 h-5.5 rounded-full object-cover border border-outline-variant/30" alt={rPost.authorId.name} onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(rPost.authorId?.name || 'U')}&background=random`; }} />
                 ) : (
                   <div className="w-5.5 h-5.5 rounded-full bg-primary/5 text-primary flex items-center justify-center font-bold text-xs border border-primary/10">
                     {getAvatarFallback(rPost.authorId?.name || '')}

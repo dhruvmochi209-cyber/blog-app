@@ -79,6 +79,9 @@ export function HeroPostCard({ post, isBookmarked, onBookmarkToggle }: HeroPostC
                   src={author.avatar}
                   className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
                   alt={author.name || 'Author'}
+                  onError={(e) => {
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(author.name || 'U')}&background=random`;
+                  }}
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-primary/15 text-primary border-2 border-white shadow-sm">

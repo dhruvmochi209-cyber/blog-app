@@ -39,7 +39,7 @@ export default function ProfileDropdown() {
         aria-label="User Profile Dropdown"
       >
         {user.avatar ? (
-          <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+          <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=random`; }} />
         ) : (
           <span className="font-label-caps text-gray-600 text-sm font-bold">
             {user.name.charAt(0).toUpperCase()}
