@@ -294,7 +294,7 @@ function FeedContent() {
           </div>
 
           {/* ── Right Sidebar: lg:col-span-4 ─────────────────── */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 self-start sticky top-24">
             <RightSidebar />
           </div>
         </div>

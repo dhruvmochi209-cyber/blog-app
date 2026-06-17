@@ -117,11 +117,11 @@ export default function SideNavBar() {
               <Link
                 href="/write"
                 onClick={handleLinkClick}
-                className="flex items-center justify-center gap-3 px-4 py-4 rounded-[20px] bg-surface-container-lowest border border-outline-variant/50 text-on-surface hover:border-primary/50 hover:shadow-[0_0_20px_rgba(79,70,229,0.15)] transition-all duration-300 group select-none relative overflow-hidden"
+                className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-xl bg-primary text-white hover:bg-primary/90 shadow-[0_4px_20px_rgba(79,70,229,0.25)] hover:shadow-[0_8px_30px_rgba(79,70,229,0.35)] transition-all duration-300 group select-none relative overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <PenLine className="size-[18px] text-primary group-hover:scale-110 transition-transform duration-300 relative z-10" />
-                <span className="font-label-caps text-xs uppercase tracking-widest font-black relative z-10">Write a Story</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <PenLine className="size-[18px] text-white group-hover:scale-110 transition-transform duration-300 relative z-10" />
+                <span className="font-bold text-[14px] tracking-wide relative z-10">Write a Story</span>
               </Link>
             </div>
           )}
