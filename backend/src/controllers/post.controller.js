@@ -88,10 +88,20 @@ export const getAllPublished = async (req, res) => {
   }
 
   if (search && search.trim()) {
+    const searchTerm = search.trim();
+    // 1. Find users whose names match the search term
+    const matchingUsers = await User.find({ name: { $regex: searchTerm, $options: 'i' } }).select('_id');
+    const authorIds = matchingUsers.map(u => u._id);
+
     filter.$or = [
-      { title: { $regex: search.trim(), $options: 'i' } },
-      { excerpt: { $regex: search.trim(), $options: 'i' } },
+      { title: { $regex: searchTerm, $options: 'i' } },
+      { excerpt: { $regex: searchTerm, $options: 'i' } },
     ];
+
+    // 2. If we found matching authors, include their posts in the search results
+    if (authorIds.length > 0) {
+      filter.$or.push({ authorId: { $in: authorIds } });
+    }
   }
 
   const sortObj = {};
