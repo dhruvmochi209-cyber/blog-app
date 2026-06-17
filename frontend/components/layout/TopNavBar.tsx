@@ -9,7 +9,7 @@ import ProfileDropdown from './ProfileDropdown';
 import { Search, Edit3, Bell, Sun, Moon } from 'lucide-react';
 
 export default function TopNavBar() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { toggleSidebar } = useUIStore();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const router = useRouter();
@@ -106,7 +106,12 @@ export default function TopNavBar() {
           {/* Theme Toggle Removed */}
 
           {/* Theme Toggle Removed */}
-          {user ? (
+          {loading ? (
+             <div className="hidden sm:flex items-center gap-2 font-body-md text-sm text-on-surface-variant/50 cursor-default">
+               <Edit3 className="size-4 opacity-50" />
+               <span className="opacity-50">Write</span>
+             </div>
+          ) : user ? (
             <Link
               href="/write"
               id="topnavbar-write-btn"
@@ -127,7 +132,9 @@ export default function TopNavBar() {
           )}
 
           {/* Sign In / Profile */}
-          {user ? (
+          {loading ? (
+             <div className="w-9 h-9 rounded-full bg-surface-container-high animate-pulse ml-1" />
+          ) : user ? (
             <ProfileDropdown />
           ) : (
             <Link
