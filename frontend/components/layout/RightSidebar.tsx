@@ -33,7 +33,7 @@ export default function RightSidebar() {
   }, []);
 
   return (
-    <aside className="hidden lg:flex flex-col w-full gap-4">
+    <aside className="flex flex-col w-full gap-4">
 
       {/* Trending Stories Section */}
       <section className="rounded-3xl p-6 bg-white border border-slate-200 shadow-sm flex-1 flex flex-col mb-4 relative overflow-hidden">

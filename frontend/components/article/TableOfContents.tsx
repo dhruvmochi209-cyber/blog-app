@@ -16,8 +16,8 @@ export function TableOfContents({ headings, activeHeadingId, readingTime }: Tabl
   if (headings.length === 0) return null;
 
   return (
-    <aside className="hidden lg:block w-[240px] xl:w-[280px] shrink-0">
-      <div className="sticky top-24 space-y-6 bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm">
+    <aside className="w-full lg:w-[240px] xl:w-[280px] shrink-0 mt-8 lg:mt-0">
+      <div className="lg:sticky lg:top-24 space-y-6 bg-white border border-slate-200/60 rounded-[2rem] lg:rounded-3xl p-6 shadow-sm">
         <h4 className="font-label-caps text-[11px] text-slate-800 font-bold uppercase tracking-widest pb-3 border-b border-slate-100">
           Table of Contents
         </h4>

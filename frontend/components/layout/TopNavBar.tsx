@@ -105,27 +105,27 @@ export default function TopNavBar() {
 
           {/* Write Button */}
           {loading ? (
-             <div className="hidden sm:flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-400 cursor-default">
+             <div className="flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-400 cursor-default">
                <Edit3 className="size-[18px] opacity-50" strokeWidth={2.5} />
-               <span className="opacity-50">Write</span>
+               <span className="hidden sm:inline opacity-50">Write</span>
              </div>
           ) : user ? (
             <Link
               href="/write"
               id="topnavbar-write-btn"
-              className="hidden sm:flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors active:scale-95"
+              className="flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors active:scale-95"
             >
               <Edit3 className="size-[18px]" strokeWidth={2.5} />
-              Write
+              <span className="hidden sm:inline">Write</span>
             </Link>
           ) : (
             <Link
               href="/login"
               id="topnavbar-write-anonymous-btn"
-              className="hidden sm:flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              className="flex items-center gap-2 font-body-md text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
               <Edit3 className="size-[18px]" strokeWidth={2.5} />
-              Write
+              <span className="hidden sm:inline">Write</span>
             </Link>
           )}
 
