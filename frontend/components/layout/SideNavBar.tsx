@@ -93,18 +93,18 @@ export default function SideNavBar() {
                   href={item.href}
                   onClick={handleLinkClick}
                   id={`sidenav-${item.name.toLowerCase()}`}
-                  className={`relative flex items-center gap-4 px-5 py-4 rounded-[20px] transition-all duration-300 group select-none overflow-hidden ${
+                  className={`relative flex items-center gap-4 px-6 py-4 rounded-3xl transition-all duration-300 group select-none ${
                     isActive
-                      ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/20 translate-x-2'
-                      : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-1 border border-transparent hover:border-outline-variant/50 hover:shadow-sm'
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
                   }`}
                 >
-                  <item.icon className={`size-[22px] transition-transform duration-300 ${isActive ? 'scale-110 text-white' : 'group-hover:scale-110 group-hover:text-primary'}`} />
-                  <span className={`font-body-md text-[15px] tracking-wide ${isActive ? 'font-black' : 'font-semibold'}`}>{item.name}</span>
+                  <item.icon className={`size-5 transition-transform duration-300 ${isActive ? 'text-white' : 'text-slate-600 group-hover:text-slate-900'}`} />
+                  <span className={`font-sans text-[16px] tracking-wide ${isActive ? 'font-bold' : 'font-semibold'}`}>{item.name}</span>
                   
                   {/* Decorative glowing dot for active state */}
                   {isActive && (
-                    <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_2px_rgba(255,255,255,0.6)] animate-pulse" />
+                    <div className="absolute right-5 w-1.5 h-1.5 rounded-full bg-white/70 shadow-[0_0_8px_2px_rgba(255,255,255,0.4)]" />
                   )}
                 </Link>
               );
