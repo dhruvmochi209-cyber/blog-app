@@ -41,48 +41,33 @@ export function HeroPostCard({ post, isBookmarked, onBookmarkToggle }: HeroPostC
         show: { opacity: 1, scale: 1, transition: { duration: 0.5 } }
       }}
       onClick={() => router.push(`/feed/${post.slug}`)}
-      className="relative overflow-hidden rounded-2xl glass-card group cursor-pointer border border-white/5 hover:border-primary/30 transition-all"
+      className="relative flex flex-col-reverse md:flex-row overflow-hidden rounded-[2rem] bg-[#f8f9fa] shadow-sm border border-slate-200 group cursor-pointer hover:border-primary/30 hover:shadow-md transition-all duration-300"
     >
-      {post.coverImage ? (
-        <div className="aspect-[16/9] md:aspect-[21/9] w-full relative">
-          <img
-            src={post.coverImage}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            alt="Featured Post"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-gray-900/10" />
-        </div>
-      ) : (
-        <div className="aspect-[21/9] w-full bg-surface-container-high flex items-center justify-center">
-          <FileText className="size-12 text-on-surface-variant/20" />
-        </div>
-      )}
-
-      {/* Hero content overlay */}
-      <div className={`${post.coverImage ? 'absolute bottom-0 left-0 w-full' : ''} p-6 md:p-8 z-10`}>
-        <div className="flex gap-3 mb-3">
+      {/* Text Section (Left half on desktop) */}
+      <div className="flex-1 p-6 md:p-10 flex flex-col justify-center z-10">
+        <div className="flex gap-3 mb-4">
           {post.category && (
-            <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold tracking-widest uppercase ${post.coverImage ? 'bg-primary text-white' : 'bg-primary/20 text-primary border border-primary/20'}`}>
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold tracking-widest uppercase bg-primary/10 text-primary border border-primary/20">
               {post.category}
             </span>
           )}
-          <span className={`text-xs font-mono flex items-center gap-1 font-medium ${post.coverImage ? 'text-white/90' : 'text-on-surface-variant/80'}`}>
-            <Clock className="size-3" />
+          <span className="text-xs font-mono flex items-center gap-1 font-semibold text-slate-500">
+            <Clock className="size-3.5" />
             {calculateReadingTime(post.htmlContent)} MIN READ
           </span>
         </div>
 
-        <h1 className={`font-headline-md text-2xl md:text-3xl lg:text-4xl font-black mb-3 transition-colors leading-snug line-clamp-2 ${post.coverImage ? 'text-white group-hover:text-primary-100' : 'text-on-surface group-hover:text-primary'}`}>
+        <h1 className="font-headline-md text-2xl md:text-3xl lg:text-4xl font-black mb-4 text-slate-900 group-hover:text-primary transition-colors leading-tight line-clamp-3">
           {post.title}
         </h1>
 
         {post.excerpt && (
-          <p className={`text-sm md:text-base line-clamp-2 max-w-2xl mb-6 leading-relaxed ${post.coverImage ? 'text-white/80' : 'text-on-surface-variant'}`}>
+          <p className="text-sm md:text-[15px] line-clamp-2 max-w-2xl mb-8 leading-relaxed text-slate-600 font-medium">
             {post.excerpt}
           </p>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-200/60">
           <div className="flex items-center gap-3">
             <Link
               href={`/profile/${author._id || ''}`}
@@ -92,19 +77,19 @@ export function HeroPostCard({ post, isBookmarked, onBookmarkToggle }: HeroPostC
               {author.avatar ? (
                 <img
                   src={author.avatar}
-                  className={`w-9 h-9 rounded-full object-cover border-2 ${post.coverImage ? 'border-white/20' : 'border-outline-variant'}`}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
                   alt={author.name || 'Author'}
                 />
               ) : (
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm ${post.coverImage ? 'bg-white/20 text-white' : 'bg-primary/15 text-primary'}`}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-primary/15 text-primary border-2 border-white shadow-sm">
                   {getAvatarFallback(author.name)}
                 </div>
               )}
               <div>
-                <div className={`text-sm font-bold transition-colors ${post.coverImage ? 'text-white group-hover/author:text-primary-100' : 'text-on-surface group-hover/author:text-primary'}`}>
+                <div className="text-sm font-bold transition-colors text-slate-800 group-hover/author:text-primary">
                   {author.name || 'Anonymous'}
                 </div>
-                <div className={`text-xs ${post.coverImage ? 'text-white/60' : 'text-on-surface-variant'}`}>{formatDate(post.createdAt)}</div>
+                <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mt-0.5">{formatDate(post.createdAt)}</div>
               </div>
             </Link>
           </div>
@@ -114,12 +99,28 @@ export function HeroPostCard({ post, isBookmarked, onBookmarkToggle }: HeroPostC
               e.stopPropagation();
               onBookmarkToggle(post._id);
             }}
-            className={`p-2.5 rounded-full transition-all duration-200 cursor-pointer border-0 ${post.coverImage ? 'text-white/80 hover:text-white hover:bg-white/20' : 'text-on-surface-variant/70 hover:text-primary hover:bg-surface-variant'}`}
+            className="p-3 rounded-full transition-all duration-200 cursor-pointer bg-white border border-slate-200 shadow-sm text-slate-400 hover:text-primary hover:border-primary/30"
           >
-            <Bookmark className="size-4.5" fill={isBookmarked ? 'currentColor' : 'none'} />
+            <Bookmark className="size-4" strokeWidth={2.5} fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
         </div>
       </div>
+
+      {/* Image Section (Right half on desktop) */}
+      {post.coverImage ? (
+        <div className="w-full md:w-[45%] lg:w-[50%] h-64 md:h-auto relative shrink-0 overflow-hidden bg-slate-100">
+          <img
+            src={post.coverImage}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            alt="Featured Post"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#f8f9fa] via-transparent to-transparent opacity-100 hidden md:block w-32" />
+        </div>
+      ) : (
+        <div className="w-full md:w-[45%] lg:w-[50%] h-64 md:h-auto bg-slate-100 flex items-center justify-center border-l border-slate-200">
+          <FileText className="size-16 text-slate-300" strokeWidth={1} />
+        </div>
+      )}
     </motion.section>
   );
 }

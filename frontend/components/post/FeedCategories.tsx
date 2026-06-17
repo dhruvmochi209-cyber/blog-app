@@ -30,16 +30,16 @@ export function FeedCategories({
   };
 
   return (
-    <div className="flex flex-col gap-5 w-full">
+    <div className="flex flex-col gap-6 w-full">
       {/* Full Width Search Bar */}
-      <form onSubmit={handleSearch} className="relative flex items-center w-full h-11 shadow-sm group">
-        <Search className="absolute left-4 size-4 text-on-surface-variant/60 group-focus-within:text-primary transition-colors pointer-events-none z-10" />
+      <form onSubmit={handleSearch} className="relative flex items-center w-full h-12 shadow-sm group">
+        <Search className="absolute left-4 size-5 text-on-surface-variant/40 group-focus-within:text-primary transition-colors pointer-events-none z-10" strokeWidth={2.5} />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search articles, topics, or authors..."
-          className="w-full h-full bg-surface-container-low border border-outline-variant/40 text-sm rounded-2xl pl-11 pr-10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-on-surface placeholder:text-on-surface-variant/50"
+          className="w-full h-full bg-[#f8f9fa] border-2 border-transparent text-[15px] rounded-full pl-12 pr-12 focus:border-primary/20 focus:bg-white focus:shadow-sm outline-none transition-all text-on-surface placeholder:text-on-surface-variant/50 font-medium"
         />
         {searchQuery && (
           <button 
@@ -48,15 +48,15 @@ export function FeedCategories({
               setSearchQuery('');
               router.push('/feed');
             }}
-            className="absolute right-3 p-1.5 hover:bg-surface-variant rounded-full text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors z-10"
+            className="absolute right-3 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 hover:text-slate-700 cursor-pointer transition-colors z-10"
           >
-            <X className="size-4" />
+            <X className="size-4" strokeWidth={2.5} />
           </button>
         )}
       </form>
 
-      {/* Category Tabs */}
-      <div className="flex gap-6 overflow-x-auto no-scrollbar pb-1 w-full border-b border-outline-variant/20">
+      {/* Category Tabs - Pill Shaped */}
+      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 w-full px-1">
         {allTabs.map((tab) => {
           const isActive = activeTab === tab;
           return (
@@ -64,16 +64,13 @@ export function FeedCategories({
               key={tab}
               onClick={() => onTabChange(tab)}
               id={`feed-tab-${tab.toLowerCase().replace(/\s+/g, '-')}`}
-              className={`relative whitespace-nowrap font-body-md text-sm pb-2 transition-all duration-200 cursor-pointer select-none bg-transparent border-0 outline-none ${
+              className={`relative whitespace-nowrap font-body-md text-sm px-5 py-2 rounded-full transition-all duration-300 cursor-pointer select-none border outline-none font-semibold shadow-sm active:scale-95 ${
                 isActive
-                  ? 'text-primary font-bold'
-                  : 'text-on-surface-variant hover:text-on-surface'
+                  ? 'bg-primary text-white border-primary shadow-primary/20'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
               {tab}
-              {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-t-full" />
-              )}
             </button>
           );
         })}
