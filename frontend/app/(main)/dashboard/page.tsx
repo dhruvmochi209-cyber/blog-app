@@ -11,6 +11,7 @@ import { PostsTable } from '@/components/dashboard/PostsTable';
 import { DeletePostModal } from '@/components/dashboard/DeletePostModal';
 import TopNavBar from '@/components/layout/TopNavBar';
 import SideNavBar from '@/components/layout/SideNavBar';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
@@ -51,16 +52,7 @@ export default function CreatorDashboard() {
   const [transitioningDeleteIds, setTransitioningDeleteIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // ── Strict Security Redirect ──
-  useEffect(() => {
-    if (!authLoading) {
-      if (user === null) {
-        router.replace('/login');
-      } else if (user && user.role !== 'CREATOR') {
-        router.replace('/feed');
-      }
-    }
-  }, [user, authLoading, router]);
+  // Security handled by ProtectedRoute wrapper
 
   // ── Fetch Portfolio Data ──
   const fetchDashboardData = async () => {
@@ -182,25 +174,12 @@ export default function CreatorDashboard() {
     }, 500);
   };
 
-  if (authLoading || !user || user.role !== 'CREATOR') {
-    return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center relative overflow-hidden">
-        <div className="absolute top-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-primary/5 blur-3xl select-none pointer-events-none" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[30vw] h-[30vw] rounded-full bg-primary/5 blur-3xl select-none pointer-events-none" />
-
-        <div className="flex flex-col items-center gap-4 z-10 animate-pulse">
-          <Loader2 className="animate-spin text-primary size-10" />
-          <p className="font-label-caps text-xs text-on-surface-variant font-semibold uppercase tracking-wider select-none">
-            Verifying credentials...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Loading states handled by ProtectedRoute
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative font-body-md transition-colors duration-300">
-      <TopNavBar />
+    <ProtectedRoute creatorOnly={true}>
+      <div className="min-h-screen bg-background text-foreground flex flex-col relative font-body-md transition-colors duration-300">
+        <TopNavBar />
 
       <div className="flex-1 flex w-full pt-16">
         <SideNavBar />
@@ -271,5 +250,6 @@ export default function CreatorDashboard() {
         handleDeletePost={handleDeletePost}
       />
     </div>
+    </ProtectedRoute>
   );
 }
