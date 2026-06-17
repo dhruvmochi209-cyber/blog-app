@@ -11,8 +11,8 @@ export function RelatedStories({ relatedLoading, relatedPosts, calculateReadingT
   };
 
   return (
-    <div className="related-stories-section border-t border-outline-variant/40 pt-16 pb-24">
-      <h3 className="font-headline-md text-xl md:text-2xl font-black uppercase tracking-tight text-on-surface mb-8">
+    <div className="related-stories-section pt-12 pb-24 border-t border-slate-200 mt-8">
+      <h3 className="font-headline-md text-xl md:text-2xl font-black uppercase tracking-tight text-slate-900 mb-8">
         Related Stories
       </h3>
 
@@ -32,9 +32,9 @@ export function RelatedStories({ relatedLoading, relatedPosts, calculateReadingT
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
               onClick={() => router.push(`/feed/${rPost.slug}`)}
-              className="group flex flex-col justify-between bg-surface-container-lowest/30 hover:bg-surface-container-lowest border border-outline-variant/30 hover:border-outline-variant/80 rounded-xl p-4 cursor-pointer transition-all duration-300 editorial-shadow hover:-translate-y-0.5"
+              className="group flex flex-col justify-between bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-2xl p-5 cursor-pointer transition-all duration-300 shadow-sm hover:-translate-y-1"
             >
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {/* Image preview */}
                 {rPost.coverImage ? (
                   <div className="w-full aspect-[16/10] overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-container-low shrink-0 relative">
@@ -45,21 +45,21 @@ export function RelatedStories({ relatedLoading, relatedPosts, calculateReadingT
                     />
                   </div>
                 ) : (
-                  <div className="w-full aspect-[16/10] rounded-lg border border-dashed border-outline-variant bg-surface-container-low/20 shrink-0 flex items-center justify-center text-secondary/40 select-none">
+                  <div className="w-full aspect-[16/10] rounded-xl border border-dashed border-slate-200 bg-slate-50 shrink-0 flex items-center justify-center text-slate-300 select-none">
                     <span className="material-symbols-outlined text-3xl">image</span>
                   </div>
                 )}
 
                 <div className="space-y-2">
                   {rPost.category && (
-                    <span className="inline-block px-2.5 py-0.5 bg-surface-container text-on-surface-variant rounded-full text-sm font-bold uppercase tracking-wider font-label-caps border border-outline-variant/20">
+                    <span className="inline-block px-2.5 py-0.5 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest font-mono border border-primary/20">
                       {rPost.category}
                     </span>
                   )}
-                  <h4 className="font-headline-md text-sm font-bold text-on-surface group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug">
+                  <h4 className="font-headline-md text-[15px] font-black text-slate-900 group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug">
                     {rPost.title}
                   </h4>
-                  <p className="text-on-surface-variant font-light text-xs line-clamp-2 leading-relaxed">
+                  <p className="text-slate-500 font-medium text-[13px] line-clamp-2 leading-relaxed">
                     {rPost.excerpt || 'No description provided.'}
                   </p>
                 </div>

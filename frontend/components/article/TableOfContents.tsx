@@ -17,11 +17,11 @@ export function TableOfContents({ headings, activeHeadingId, readingTime }: Tabl
 
   return (
     <aside className="hidden lg:block w-[240px] xl:w-[280px] shrink-0">
-      <div className="sticky top-24 space-y-6 bg-surface-container-lowest/30 border border-outline-variant/40 rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.01)] backdrop-blur-xs">
-        <h4 className="font-label-caps text-xs text-on-surface font-bold uppercase tracking-widest pb-3 border-b border-outline-variant/30">
+      <div className="sticky top-24 space-y-6 bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm">
+        <h4 className="font-label-caps text-[11px] text-slate-800 font-bold uppercase tracking-widest pb-3 border-b border-slate-100">
           Table of Contents
         </h4>
-        <ul className="space-y-3.5 text-xs max-h-[calc(100vh-280px)] overflow-y-auto no-scrollbar scroll-smooth pr-1">
+        <ul className="space-y-3.5 text-[13px] max-h-[calc(100vh-280px)] overflow-y-auto no-scrollbar scroll-smooth pr-1">
           {headings.map((heading) => {
             const isH3 = heading.level === 'h3';
             const isActive = activeHeadingId === heading.id;
@@ -39,10 +39,10 @@ export function TableOfContents({ headings, activeHeadingId, readingTime }: Tabl
                       block: 'start',
                     });
                   }}
-                  className={`group flex items-start gap-1.5 py-0.5 leading-normal transition-all duration-200 hover:text-primary ${
+                  className={`group flex items-start gap-2 py-1 leading-normal transition-all duration-200 hover:text-primary ${
                     isActive 
                       ? 'text-primary font-bold' 
-                      : 'text-on-surface-variant font-medium'
+                      : 'text-slate-500 font-medium'
                   }`}
                 >
                   <ChevronRight 
@@ -60,8 +60,8 @@ export function TableOfContents({ headings, activeHeadingId, readingTime }: Tabl
         </ul>
         
         {/* Sticky Footer Info */}
-        <div className="border-t border-outline-variant/30 pt-4 flex items-center justify-between text-xs text-on-surface-variant font-medium select-none">
-          <span className="flex items-center gap-1"><Clock className="size-3" /> {readingTime} min read</span>
+        <div className="border-t border-slate-100 pt-4 flex items-center justify-between text-[11px] text-slate-500 font-bold uppercase tracking-wider font-mono select-none">
+          <span className="flex items-center gap-1.5"><Clock className="size-3.5 opacity-70" /> {readingTime} min read</span>
           <span>{headings.length} sections</span>
         </div>
       </div>

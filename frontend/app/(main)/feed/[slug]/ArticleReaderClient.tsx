@@ -302,7 +302,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
+    <div className="min-h-screen bg-[#f8f9fa] text-foreground flex flex-col selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
       <TopNavBar />
 
       {/* Dynamic Reading Progress Bar */}
@@ -313,7 +313,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
       <div className="flex-1 flex w-full">
         <SideNavBar />
 
-        <main className="flex-1 flex justify-center py-10 px-margin-mobile md:px-margin-desktop relative bg-background">
+        <main className="flex-1 flex justify-center py-10 px-margin-mobile md:px-margin-desktop relative bg-[#f8f9fa]">
 
           {/* Back Navigation Button */}
           <Link
@@ -349,18 +349,18 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
             ) : post ? (
               <>
                 {/* Left Column: Article Content */}
-                <div className="w-full max-w-[720px] shrink-1">
+                <div className="w-full max-w-[880px] shrink-1">
                   <motion.article
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="space-y-8 pb-20"
+                    className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 p-8 md:p-12 lg:p-16 mb-16"
                   >
 
                     {/* Header Category Tag */}
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mb-6">
                       {post.category ? (
-                        <span className="inline-block px-3 py-1 bg-surface-container border border-outline-variant/30 text-on-surface rounded-full text-xs font-bold uppercase tracking-widest font-label-caps select-none">
+                        <span className="inline-block px-3 py-1 bg-primary/10 border border-primary/20 text-primary rounded-full text-[11px] font-bold uppercase tracking-widest font-mono select-none">
                           {post.category}
                         </span>
                       ) : (
@@ -369,13 +369,13 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                     </div>
 
                     {/* Article Title */}
-                    <h1 className="font-display-xl text-3xl md:text-4xl lg:text-5xl font-black text-on-surface leading-[1.1] tracking-tight">
+                    <h1 className="font-headline-md text-4xl md:text-5xl lg:text-[52px] font-black text-slate-900 leading-[1.15] tracking-tight mb-8">
                       {post.title}
                     </h1>
 
                     {/* Author Profile Metadata Row */}
-                    <div className="flex items-center justify-between border-y border-outline-variant/30 py-4">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between border-y border-slate-100 py-5 mb-10">
+                      <div className="flex items-center gap-4">
                         <Link href={`/profile/${post.authorId?._id || ''}`} className="flex items-center gap-3 group/author">
                           {post.authorId?.avatar ? (
                             <img
@@ -391,15 +391,15 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                           )}
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-body-md text-sm text-on-surface font-semibold group-hover/author:text-primary transition-colors">{post.authorId?.name || 'Anonymous'}</span>
+                              <span className="font-sans text-[15px] text-slate-900 font-bold group-hover/author:text-primary transition-colors">{post.authorId?.name || 'Anonymous'}</span>
                               {post.authorId?.role === 'CREATOR' && (
-                                <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold font-label-caps uppercase select-none">Creator</span>
+                                <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-black tracking-widest uppercase select-none">Creator</span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2.5 text-xs text-on-surface-variant font-medium mt-0.5">
-                              <span className="flex items-center gap-1"><Calendar className="size-3" /> {formatDate(post.createdAt)}</span>
-                              <span className="text-on-surface-variant/40 select-none">·</span>
-                              <span className="flex items-center gap-1"><Clock className="size-3" /> {calculateReadingTime(post.htmlContent)} min read</span>
+                            <div className="flex items-center gap-3 text-[13px] text-slate-500 font-medium mt-1">
+                              <span className="flex items-center gap-1.5"><Calendar className="size-3.5 opacity-70" /> {formatDate(post.createdAt)}</span>
+                              <span className="text-slate-300 select-none">·</span>
+                              <span className="flex items-center gap-1.5"><Clock className="size-3.5 opacity-70" /> {calculateReadingTime(post.htmlContent)} min read</span>
                             </div>
                           </div>
                         </Link>
@@ -408,7 +408,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
 
                     {/* Optional Cover Image Banner */}
                     {post.coverImage && (
-                      <div className="w-full aspect-[2/1] overflow-hidden rounded-xl border border-outline-variant/35 bg-surface-container-low shadow-sm">
+                      <div className="w-full aspect-[2/1] overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-100 shadow-sm mb-12">
                         <img
                           src={post.coverImage}
                           className="w-full h-full object-cover animate-in zoom-in-95 duration-500"
@@ -418,7 +418,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                     )}
 
                     {/* Rich-Text Content Column */}
-                    <div className="tiptap text-on-surface/90 pt-4 prose prose-zinc max-w-none text-lg leading-relaxed font-serif">
+                    <div className="tiptap text-slate-700 pt-2 prose prose-zinc prose-lg lg:prose-xl max-w-none leading-relaxed font-serif">
                       <div dangerouslySetInnerHTML={{ __html: getProcessedHtml(post.htmlContent) }} />
                     </div>
 
