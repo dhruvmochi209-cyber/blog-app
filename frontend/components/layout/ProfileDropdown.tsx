@@ -35,13 +35,13 @@ export default function ProfileDropdown() {
     <div className="relative shrink-0" ref={menuRef}>
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant/30 ml-1 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all focus:outline-none"
+        className={`w-10 h-10 rounded-full bg-[#f3f4f6] flex items-center justify-center overflow-hidden border-2 cursor-pointer hover:shadow-md transition-all focus:outline-none focus:ring-4 focus:ring-indigo-500/20 active:scale-95 ml-2 ${showMenu ? 'border-indigo-500 shadow-sm' : 'border-transparent'}`}
         aria-label="User Profile Dropdown"
       >
         {user.avatar ? (
           <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
         ) : (
-          <span className="font-label-caps text-on-surface text-xs font-semibold">
+          <span className="font-label-caps text-gray-600 text-sm font-bold">
             {user.name.charAt(0).toUpperCase()}
           </span>
         )}
@@ -49,43 +49,47 @@ export default function ProfileDropdown() {
 
       {/* Dropdown Menu */}
       {showMenu && (
-        <div className="absolute right-0 top-11 w-56 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-          <div className="px-4 py-3 border-b border-outline-variant/20">
-            <p className="font-body-md text-sm font-semibold text-on-surface truncate">{user.name}</p>
-            <p className="font-body-md text-xs text-on-surface-variant truncate">{user.email}</p>
+        <div className="absolute right-0 top-14 w-64 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-3xl shadow-[0_12px_40px_rgb(0,0,0,0.08)] py-3 animate-in fade-in zoom-in-95 duration-200 z-50 origin-top-right">
+          <div className="px-5 py-3 border-b border-gray-100 mb-2">
+            <p className="font-headline-md text-base font-black text-gray-900 truncate tracking-tight">{user.name}</p>
+            <p className="font-body-md text-xs text-gray-500 truncate">{user.email}</p>
           </div>
-          {user.role === 'CREATOR' && (
+          
+          <div className="px-2 space-y-1">
+            {user.role === 'CREATOR' && (
+              <Link
+                href="/dashboard"
+                onClick={() => setShowMenu(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-[#f3f4f6] hover:text-indigo-600 transition-all cursor-pointer group"
+              >
+                <LayoutDashboard className="size-[18px] text-gray-400 group-hover:text-indigo-500 transition-colors" />
+                <span>Dashboard</span>
+              </Link>
+            )}
             <Link
-              href="/dashboard"
+              href="/profile"
               onClick={() => setShowMenu(false)}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer font-medium"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-[#f3f4f6] hover:text-indigo-600 transition-all cursor-pointer group"
             >
-              <LayoutDashboard className="size-[18px] text-primary" />
-              <span>Dashboard</span>
+              <User className="size-[18px] text-gray-400 group-hover:text-indigo-500 transition-colors" />
+              <span>Profile</span>
             </Link>
-          )}
-          <Link
-            href="/profile"
-            onClick={() => setShowMenu(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer"
-          >
-            <User className="size-[18px]" />
-            Profile
-          </Link>
-          <Link
-            href="/bookmarks"
-            onClick={() => setShowMenu(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer"
-          >
-            <Bookmark className="size-[18px]" />
-            Bookmarks
-          </Link>
-          <div className="border-t border-outline-variant/20 mt-1 pt-1">
+            <Link
+              href="/bookmarks"
+              onClick={() => setShowMenu(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-[#f3f4f6] hover:text-indigo-600 transition-all cursor-pointer group"
+            >
+              <Bookmark className="size-[18px] text-gray-400 group-hover:text-indigo-500 transition-colors" />
+              <span>Bookmarks</span>
+            </Link>
+          </div>
+
+          <div className="border-t border-gray-100 mt-2 pt-2 px-2">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error-container/30 transition-colors w-full text-left font-medium cursor-pointer"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-all w-full text-left font-bold cursor-pointer group"
             >
-              <LogOut className="size-[18px]" />
+              <LogOut className="size-[18px] text-red-400 group-hover:text-red-600 transition-colors" />
               Sign out
             </button>
           </div>
