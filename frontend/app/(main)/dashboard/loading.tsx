@@ -4,7 +4,7 @@ import { DashboardSkeleton } from '@/components/ui/skeleton';
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative font-body-md transition-colors duration-300">
+    <div className="min-h-screen bg-[#f8f9fa] text-foreground flex flex-col relative font-body-md transition-colors duration-300">
       <TopNavBar />
       <div className="flex-1 flex w-full pt-16">
         <SideNavBar />

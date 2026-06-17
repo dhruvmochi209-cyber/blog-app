@@ -144,7 +144,7 @@ function FeedContent() {
   const [heroPost, ...gridPosts] = posts;
 
   return (
-    <div className="min-h-screen bg-background text-on-background flex flex-col">
+    <div className="min-h-screen bg-[#f8f9fa] text-on-background flex flex-col">
       <TopNavBar />
 
       {/* pt-16 offsets the fixed navbar */}
@@ -306,7 +306,7 @@ function FeedContent() {
 export default function FeedPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-background text-on-background flex items-center justify-center">
+      <div className="min-h-screen bg-[#f8f9fa] text-on-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="animate-spin text-primary size-8" />
           <p className="font-mono text-xs text-on-surface-variant font-semibold uppercase tracking-widest animate-pulse">

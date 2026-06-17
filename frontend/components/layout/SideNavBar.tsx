@@ -64,7 +64,7 @@ export default function SideNavBar() {
 
       {/* Responsive Navigation Sidebar/Drawer */}
       <nav
-        className={`fixed md:sticky top-0 md:top-16 left-0 h-full md:h-[calc(100vh-64px)] border-r border-outline-variant/30 py-6 bg-surface/40 backdrop-blur-2xl transition-all duration-300 ease-in-out overflow-hidden flex flex-col z-50 md:z-30 shadow-2xl md:shadow-none ${
+        className={`fixed md:sticky top-0 md:top-16 left-0 h-full md:h-[calc(100vh-64px)] border-r border-slate-200 py-6 bg-white transition-all duration-300 ease-in-out overflow-hidden flex flex-col z-50 md:z-30 shadow-2xl md:shadow-none ${
           sidebarOpen
             ? 'w-[260px] translate-x-0 opacity-100 pointer-events-auto'
             : 'w-[260px] md:w-0 -translate-x-full md:translate-x-0 md:border-r-0 md:opacity-0 md:px-0 md:pointer-events-none'

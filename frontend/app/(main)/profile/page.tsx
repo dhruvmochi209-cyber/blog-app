@@ -22,7 +22,7 @@ export default function ProfileRedirect() {
   }, [user, loading, router]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-body-md">
+    <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-body-md">
       <TopNavBar />
       <div className="flex-1 flex w-full pt-16">
         <SideNavBar />
