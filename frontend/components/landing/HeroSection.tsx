@@ -17,9 +17,9 @@ export function HeroSection() {
           <span className="inline-flex items-center gap-2 font-label-caps text-sm text-indigo-600 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-full tracking-[0.2em] uppercase font-bold backdrop-blur-md">
             <Zap className="size-4 text-indigo-500" /> The Next-Gen Dev Platform
           </span>
-          <h1 className="font-serif text-5xl md:text-6xl lg:text-[5rem] font-black text-gray-900 leading-[1.05] tracking-tight ">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] font-black text-gray-900 leading-[1.1] tracking-tight ">
             Share your engineering <br className="hidden md:block" />
-            <div className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-[#4338ca] italic text-7xl">journey to CodeNexus</div>
+            <div className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-[#4338ca] italic text-5xl sm:text-6xl md:text-7xl mt-2">journey to CodeNexus</div>
           </h1>
           <p className="font-body-lg text-base md:text-lg text-gray-600 max-w-2xl leading-relaxed">
             CodeNexus is a modern blog application for software engineers, designers, and tech enthusiasts to publish articles, share coding experiences, and document their work.
