@@ -1,5 +1,6 @@
 import { Loader2, FileText } from 'lucide-react';
 import { PostListItem } from '@/components/dashboard/PostListItem';
+import { PostsTableSkeleton } from '@/components/ui/skeleton';
 
 export function PostsTable({ 
   posts, 
@@ -22,10 +23,7 @@ export function PostsTable({
 
       <div className="w-full flex flex-col gap-3">
         {loading ? (
-          <div className="py-20 flex flex-col items-center justify-center gap-3 bg-surface-container-low rounded-3xl border border-outline-variant/20">
-            <Loader2 className="animate-spin text-primary size-7" />
-            <span className="font-label-caps text-xs text-on-surface-variant font-semibold tracking-wider animate-pulse">Loading workspace...</span>
-          </div>
+          <PostsTableSkeleton count={4} />
         ) : posts.length === 0 ? (
           <div className="py-24 text-center space-y-4 px-4 bg-surface-container-low rounded-3xl border border-outline-variant/20">
             <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto shadow-sm">

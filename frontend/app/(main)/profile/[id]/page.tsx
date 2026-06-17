@@ -9,6 +9,7 @@ import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import TopNavBar from '@/components/layout/TopNavBar';
 import SideNavBar from '@/components/layout/SideNavBar';
 import { useAuth } from '@/lib/auth-context';
+import { ProfilePageSkeleton } from '@/components/ui/skeleton';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://blog-application-fjg9.onrender.com/api';
 
@@ -91,9 +92,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           <main className="flex-1 max-w-[1100px] w-full min-h-[calc(100vh-61px)] flex flex-col">
             
             {loading ? (
-              <div className="flex-1 flex items-center justify-center">
-                <Loader2 className="size-10 text-primary animate-spin" />
-              </div>
+              <ProfilePageSkeleton />
             ) : profileUser ? (
               <>
                 <ProfileHeader 
