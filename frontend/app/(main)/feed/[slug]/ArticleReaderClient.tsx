@@ -325,12 +325,12 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
             Back to Feed
           </Link>
 
-          <div className="w-full max-w-[1080px] pt-12 flex gap-12 justify-center">
+          <div className="w-full max-w-[1080px] pt-8 md:pt-12 flex flex-col lg:flex-row gap-8 lg:gap-12 justify-center">
 
             {loading ? (
               <DetailsPageSkeleton />
             ) : error ? (
-              <div className="w-full max-w-lg bg-surface-container-lowest border border-outline-variant/50 rounded-xl p-12 text-center space-y-6 editorial-shadow mx-auto mt-12">
+              <div className="w-full max-w-lg bg-surface-container-lowest border border-outline-variant/50 rounded-xl p-8 md:p-12 text-center space-y-6 editorial-shadow mx-auto mt-12">
                 <div className="w-12 h-12 rounded-full bg-error-container flex items-center justify-center mx-auto text-error shadow-xs">
                   <span className="material-symbols-outlined text-2xl">warning</span>
                 </div>
@@ -349,12 +349,12 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
             ) : post ? (
               <>
                 {/* Left Column: Article Content */}
-                <div className="w-full max-w-[880px] shrink-1">
+                <div className="w-full max-w-full lg:max-w-[880px] shrink-1 px-4 sm:px-6 md:px-0">
                   <motion.article
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 p-8 md:p-12 lg:p-16 mb-16"
+                    className="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-slate-200/60 p-6 sm:p-8 md:p-12 lg:p-16 mb-16"
                   >
 
                     {/* Header Category Tag */}
@@ -369,7 +369,7 @@ export default function ArticleReaderClient({ initialPost, slug }: { initialPost
                     </div>
 
                     {/* Article Title */}
-                    <h1 className="font-headline-md text-4xl md:text-5xl lg:text-[52px] font-black text-slate-900 leading-[1.15] tracking-tight mb-8">
+                    <h1 className="font-headline-md text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-black text-slate-900 leading-[1.15] tracking-tight mb-6 md:mb-8 break-words">
                       {post.title}
                     </h1>
 
