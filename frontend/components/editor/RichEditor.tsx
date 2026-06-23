@@ -21,6 +21,8 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
     StarterKit.configure({
       codeBlock: false,
       horizontalRule: false,
+      link: false,
+      underline: false,
     }),
     Placeholder.configure({
       placeholder: 'Tell your story…',
