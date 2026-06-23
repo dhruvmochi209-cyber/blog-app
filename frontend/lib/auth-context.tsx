@@ -124,9 +124,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         if (res.ok) {
           const data = await res.json();
-          // Session restored — log in immediately
-          commitUser(data.user, data.accessToken);
-          return data.accessToken;
+          if (data.success && data.accessToken && data.user) {
+            // Session restored — log in immediately
+            commitUser(data.user, data.accessToken);
+            return data.accessToken;
+          }
+          return null;
         }
       } catch { /* network error */ }
       return null;

@@ -264,7 +264,7 @@ export const refresh = async (req, res) => {
   const token = req.cookies?.refreshToken;
 
   if (!token) {
-    throw new AppError('No refresh token found. Please log in again.', 401);
+    return res.status(200).json({ success: false, message: 'No refresh token found.' });
   }
 
   let decoded;
@@ -272,13 +272,13 @@ export const refresh = async (req, res) => {
     decoded = verifyRefreshToken(token);
   } catch {
     res.clearCookie('refreshToken', clearCookieOptions);
-    throw new AppError('Invalid or expired refresh token. Please log in again.', 401);
+    return res.status(200).json({ success: false, message: 'Invalid or expired refresh token.' });
   }
 
   const user = await User.findById(decoded.sub);
   if (!user) {
     res.clearCookie('refreshToken', clearCookieOptions);
-    throw new AppError('User no longer exists.', 401);
+    return res.status(200).json({ success: false, message: 'User no longer exists.' });
   }
 
   issueTokensAndRespond(res, user);
