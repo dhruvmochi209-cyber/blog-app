@@ -93,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(u);
     setLastUser(null);   // hide the popup once they're logged in
     saveLastUser(u);     // update the snapshot for next visit
+    localStorage.setItem('accessToken', token); // persist locally as fallback
   }, []);
 
   // ── Fetch user profile with a given token ────────────────────────────────
@@ -122,14 +123,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           method: 'POST',
           credentials: 'include',
         });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.accessToken && data.user) {
-            // Session restored — log in immediately
-            commitUser(data.user, data.accessToken);
-            return data.accessToken;
-          }
-          return null;
+        
+        const data = await res.json();
+        
+        if (res.ok && data.success && data.accessToken && data.user) {
+          // Session restored — log in immediately
+          commitUser(data.user, data.accessToken);
+          return data.accessToken;
         }
       } catch { /* network error */ }
       return null;
@@ -144,7 +144,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const initSession = async () => {
-      const token = await refreshSession();
+      let token = await refreshSession();
+      
+      // If refresh fails (e.g. cross-origin cookie blocked), fallback to local access token
+      if (!token) {
+        const localToken = localStorage.getItem('accessToken');
+        if (localToken) {
+          const u = await fetchUser(localToken);
+          if (u) {
+            commitUser(u, localToken);
+            return;
+          } else {
+            localStorage.removeItem('accessToken');
+          }
+        }
+      }
+
       if (!token) {
         // No active session — read the last-user snapshot to show the popup
         const snapshot = loadLastUser();
@@ -153,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
     initSession();
-  }, [refreshSession]);
+  }, [refreshSession, fetchUser, commitUser]);
 
   // When commitUser runs (session restored), we can stop loading
   useEffect(() => {
@@ -177,12 +192,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ── Logout ────────────────────────────────────────────────────────────────
 
   const logout = async () => {
-    await fetch(`${API}/auth/logout`, {
-      method: 'POST',
-      credentials: 'include',
-    });
+    try {
+      await fetch(`${API}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch { /* ignore network error on logout */ }
+    
     setAccessToken(null);
     setUser(null);
+    localStorage.removeItem('accessToken');
     // Keep lastUser so the popup re-appears next time they visit
   };
 
