@@ -41,7 +41,7 @@ export default function GoogleOneTap() {
     onError: () => setError('Google One-Tap failed'),
     // Only prompt if we are not loading, have no session, and are on /login or /register
     disabled: loading || user !== null || !isAuthPage,
-    use_fedcm_for_prompt: true,
+    use_fedcm_for_prompt: false,
     cancel_on_tap_outside: false,
   });
 

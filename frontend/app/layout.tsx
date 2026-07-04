@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
           <AuthProvider>
             <Providers>
-              <GoogleOneTap />
+              {/* <GoogleOneTap /> */}
               {children}
             </Providers>
           </AuthProvider>
