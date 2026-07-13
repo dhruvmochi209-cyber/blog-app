@@ -53,35 +53,41 @@ export default function LandingPage() {
   if (loading) return null; // Avoid flashing content before redirect
 
   return (
-    <div className="h-screen flex flex-col bg-white text-gray-900 overflow-hidden relative transition-colors duration-300 font-sans">
+    <div className="min-h-screen flex flex-col relative transition-colors duration-300 font-sans">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop)' }}
+      />
+      {/* Dark Gradient Overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40 z-0" />
+
       {/* Hoisted document metadata for SEO */}
       <title>CodeNexus | Join the Conversation</title>
       <meta name="description" content="The leading space for technical narratives. CodeNexus is a collaborative, minimalist publication space for developers, designers, and systems architects to document software quality." />
-
-
 
       {/* Top Navigation Bar */}
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-50 flex justify-between items-center w-full px-6 transition-all duration-500 ease-in-out border-b border-gray-200 ${isScrolled
-          ? 'py-3.5 bg-white/90 backdrop-blur-md shadow-sm'
-          : 'py-5 bg-white/50 backdrop-blur-sm'
+        className={`fixed top-0 left-0 right-0 z-50 flex justify-between items-center w-full px-6 transition-all duration-500 ease-in-out border-b border-white/10 ${isScrolled
+          ? 'py-3.5 bg-black/40 backdrop-blur-md shadow-sm'
+          : 'py-5 bg-transparent'
           }`}
       >
         <div className="w-full flex justify-between items-center">
           <div className="flex items-center gap-8">
-            <Link href="/" className="font-serif italic text-3xl font-black text-gray-900 tracking-tight hover:text-indigo-600 transition-colors">
+            <Link href="/" className="font-serif italic text-3xl font-black text-white tracking-tight hover:text-indigo-300 transition-colors">
               CodeNexus
             </Link>
           </div>
           <div className="flex items-center gap-3">
 
-            <Link href="/login" id="landing-signin-btn" className="hidden sm:block font-body-md text-xs font-bold uppercase tracking-wider text-gray-600 hover:text-indigo-600 px-4 py-2 transition-colors duration-300">
+            <Link href="/login" id="landing-signin-btn" className="hidden sm:block font-body-md text-xs font-bold uppercase tracking-wider text-white hover:text-indigo-300 px-4 py-2 transition-colors duration-300">
               Sign in
             </Link>
-            <Link href="/register" id="landing-getstarted-btn" className="bg-[#4f46e5] text-white font-label-caps text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full hover:bg-[black] transition-all active:scale-95 duration-300 shadow-sm">
+            <Link href="/register" id="landing-getstarted-btn" className="bg-white/10 text-white border border-white/20 font-label-caps text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full hover:bg-white/20 transition-all active:scale-95 duration-300 shadow-sm backdrop-blur-md">
               Get started
             </Link>
           </div>
@@ -89,7 +95,7 @@ export default function LandingPage() {
       </motion.header>
 
       {/* Hero Section */}
-      <main className="flex-1 relative z-10 flex flex-col justify-center pt-20 pb-8">
+      <main className="flex-1 relative z-10 flex flex-col justify-center pt-16 pb-4">
         <HeroSection />
       </main>
 
@@ -98,10 +104,10 @@ export default function LandingPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.8 }}
-        className="w-full py-4 border-t border-gray-200 relative z-20 mt-auto"
+        className="w-full py-4 border-t border-white/10 relative z-20 mt-auto"
       >
         <div className="max-w-[1280px] mx-auto px-6 flex flex-col sm:flex-col justify-between items-center gap-2">
-          <p className="font-body-md text-sm text-gray-500">
+          <p className="font-body-md text-sm text-white/50">
             &copy; {new Date().getFullYear()} Created by Dhruv
           </p>
         </div>
